@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Viral Content OS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#020617;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0f172a}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:99px}
+::selection{background:#8b5cf640}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6!important}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const { useState, useCallback } = React;
+const h = React.createElement;
+
+// ─── CONSTANTS ────────────────────────────────────────────
+const PLATFORMS = [
+  { id: "tiktok", label: "TikTok", icon: "\u{1f3b5}", color: "#ff0050" },
+  { id: "ig-reel", label: "Instagram Reel", icon: "\u{1f4f8}", color: "#e1306c" },
+  { id: "story", label: "Story", icon: "\u{1f4f1}", color: "#833ab4" },
+  { id: "static-ad", label: "Static Ad", icon: "\u{1f5bc}️", color: "#f59e0b" },
+  { id: "yt-short", label: "YouTube Short", icon: "▶️", color: "#ff0000" },
+];
+
+const FEELINGS = [
+  { label: "Curious", icon: "\u{1f914}" },
+  { label: "Powerful", icon: "\u{1f4aa}" },
+  { label: "Smart", icon: "\u{1f9e0}" },
+  { label: "Early", icon: "⏰" },
+  { label: "Attractive", icon: "✨" },
+  { label: "Relieved", icon: "\u{1f60c}" },
+  { label: "Inspired", icon: "\u{1f525}" },
+];
+
+const GOALS = [
+  { label: "Stop Scroll", icon: "\u{1f6d1}", desc: "Make people pause and watch" },
+  { label: "Shares", icon: "\u{1f504}", desc: "Get people to send it to friends" },
+  { label: "Saves", icon: "\u{1f516}", desc: "Make people save it for later" },
+  { label: "DMs", icon: "\u{1f4ac}", desc: "Get people to message you" },
+  { label: "Clicks", icon: "\u{1f446}", desc: "Get people to tap your link" },
+  { label: "Follows", icon: "➕", desc: "Get new followers" },
+];
+
+const HOOK_TYPES = [
+  { label: "Curiosity", icon: "❓", desc: "Makes them wonder what happens next", example: "\"Nobody's talking about this...\"" },
+  { label: "Disbelief", icon: "\u{1f631}", desc: "So surprising they HAVE to keep watching", example: "\"I can't believe this actually works\"" },
+  { label: "Identity", icon: "\u{1fa9e}", desc: "They see themselves in your content", example: "\"POV: You just found out...\"" },
+  { label: "Authority", icon: "\u{1f451}", desc: "You know something they don't", example: "\"As a doctor, here's what I'd never do...\"" },
+];
+
+const NATIVE_STYLES = [
+  { label: "UGC", icon: "\u{1f933}", desc: "Looks like a regular person filmed it" },
+  { label: "Meme", icon: "\u{1f602}", desc: "Funny format people already know" },
+  { label: "Documentary", icon: "\u{1f3a5}", desc: "Tells a real story" },
+  { label: "Casual iPhone", icon: "\u{1f4f1}", desc: "Shot on phone, nothing fancy" },
+  { label: "Cinematic", icon: "\u{1f3ac}", desc: "Beautiful, movie-like quality" },
+  { label: "Interview", icon: "\u{1f399}️", desc: "Someone talking to camera" },
+];
+
+const WINNING_FORMATS = [
+  { name: "POV Discovery", platform: "TikTok", avgPerf: "2.4M avg views", hook: "POV: You just found out...", story: "Discovery → Disbelief → Proof → CTA", bestUse: "Product reveals, before/after" },
+  { name: "Comparison Hook", platform: "Instagram Reel", avgPerf: "890K avg views", hook: "X vs Y (nobody talks about this)", story: "Setup → Side-by-side → Winner → Why", bestUse: "Product differentiation, myth busting" },
+  { name: "Shock Reveal", platform: "TikTok", avgPerf: "3.1M avg views", hook: "I can't believe this actually works", story: "Tease → Build tension → Reveal → Reaction", bestUse: "Transformations, results, hacks" },
+  { name: "Walk-up Challenge", platform: "YouTube Short", avgPerf: "1.2M avg views", hook: "I asked strangers to...", story: "Setup → Approach → Reaction → Twist", bestUse: "Brand awareness, engagement bait" },
+  { name: "Relatable Meme Build", platform: "Instagram Reel", avgPerf: "650K avg views", hook: "When you [relatable moment]...", story: "Setup → Escalation → Punchline → Tag", bestUse: "Community building, shareability" },
+];
+
+const STEP_CONFIG = [
+  { label: "Tell Me About It", icon: "\u{1f4dd}", color: "#8b5cf6", shortLabel: "About" },
+  { label: "Is This a Good Idea?", icon: "\u{1f914}", color: "#6366f1", shortLabel: "Check" },
+  { label: "Build Your Hook", icon: "\u{1fa9d}", color: "#3b82f6", shortLabel: "Hook" },
+  { label: "Set the Scene", icon: "\u{1f3a8}", color: "#0ea5e9", shortLabel: "Scene" },
+  { label: "Your AI Recipe", icon: "\u{1f916}", color: "#14b8a6", shortLabel: "Recipe" },
+  { label: "Picture Perfect", icon: "\u{1f441}️", color: "#22c55e", shortLabel: "Visual" },
+  { label: "Final Check", icon: "✅", color: "#eab308", shortLabel: "Check" },
+  { label: "Your Content Pack", icon: "\u{1f381}", color: "#f97316", shortLabel: "Done!" },
+];
+
+// ─── REUSABLE COMPONENTS ──────────────────────────────────
+
+function ScoreMeter({ score, label }) {
+  var getColor = function(s) {
+    if (s <= 25) return "#ef4444";
+    if (s <= 50) return "#f59e0b";
+    if (s <= 75) return "#3b82f6";
+    return "#22c55e";
+  };
+  var getEmoji = function(s) {
+    if (s <= 25) return "\u{1f62c}";
+    if (s <= 50) return "\u{1f937}";
+    if (s <= 75) return "\u{1f44d}";
+    return "\u{1f525}";
+  };
+  return h("div", { style: { marginTop: 16, background: "#0f172a", borderRadius: 16, padding: 16, border: "1px solid #1e293b" } },
+    h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 } },
+      h("span", { style: { fontSize: 14, color: "#94a3b8", fontWeight: 500 } }, label || "Score"),
+      h("span", { style: { fontSize: 22, fontWeight: 800, color: getColor(score) } }, getEmoji(score) + " " + score + "/100")
+    ),
+    h("div", { style: { height: 14, background: "#1e293b", borderRadius: 99, overflow: "hidden" } },
+      h("div", { style: { height: 14, width: score + "%", background: "linear-gradient(90deg, " + getColor(score) + "88, " + getColor(score) + ")", borderRadius: 99, transition: "width 0.6s ease" } })
+    )
+  );
+}
+
+function CheckItem({ checked, onChange, label, hint }) {
+  return h("button", {
+    onClick: function() { onChange(!checked); },
+    style: {
+      display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer",
+      fontSize: 15, color: checked ? "#e2e8f0" : "#94a3b8", background: checked ? "#8b5cf610" : "transparent",
+      border: "none", width: "100%", textAlign: "left", borderRadius: 10, transition: "all 0.2s",
+      marginBottom: 4,
+    }
+  },
+    h("div", {
+      style: {
+        width: 28, height: 28, borderRadius: 8, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+        border: checked ? "none" : "2.5px solid #475569",
+        background: checked ? "linear-gradient(135deg, #8b5cf6, #6366f1)" : "transparent",
+        transition: "all 0.2s", fontSize: 16,
+      }
+    }, checked && "✓"),
+    h("div", null,
+      h("div", { style: { fontWeight: 500 } }, label),
+      hint && h("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } }, hint)
+    )
+  );
+}
+
+function BigChoice({ selected, onSelect, label, icon, desc, color }) {
+  var active = selected === label;
+  return h("button", {
+    onClick: function() { onSelect(label); },
+    style: {
+      display: "flex", alignItems: "center", gap: 14, width: "100%", padding: "14px 16px",
+      background: active ? (color || "#8b5cf6") + "15" : "#0f172a",
+      border: active ? "2px solid " + (color || "#8b5cf6") : "2px solid #1e293b",
+      borderRadius: 14, cursor: "pointer", textAlign: "left", transition: "all 0.2s",
+    }
+  },
+    h("span", { style: { fontSize: 26, flexShrink: 0 } }, icon),
+    h("div", null,
+      h("div", { style: { fontSize: 15, fontWeight: 600, color: active ? "#e2e8f0" : "#94a3b8" } }, label),
+      desc && h("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } }, desc)
+    ),
+    active && h("span", { style: { marginLeft: "auto", fontSize: 18, color: color || "#8b5cf6" } }, "✓")
+  );
+}
+
+function TagPill({ label, icon, active, onClick }) {
+  return h("button", {
+    onClick: onClick,
+    style: {
+      padding: "10px 16px", borderRadius: 99, fontSize: 14, fontWeight: 500, cursor: "pointer",
+      border: active ? "2px solid #8b5cf6" : "2px solid #334155",
+      background: active ? "#8b5cf620" : "transparent",
+      color: active ? "#c4b5fd" : "#94a3b8", transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6,
+    }
+  },
+    icon && h("span", null, icon),
+    (active ? "✓ " : "") + label
+  );
+}
+
+function TextInput({ label, value, onChange, placeholder, large, hint }) {
+  var Tag = large ? "textarea" : "input";
+  return h("div", { style: { marginBottom: 18 } },
+    label && h("label", { style: { display: "block", fontSize: 14, color: "#e2e8f0", marginBottom: 6, fontWeight: 600 } }, label),
+    hint && h("p", { style: { fontSize: 12, color: "#64748b", margin: "0 0 6px" } }, hint),
+    h(Tag, {
+      value: value,
+      onChange: function(e) { onChange(e.target.value); },
+      placeholder: placeholder || "",
+      rows: large ? 4 : undefined,
+      style: {
+        width: "100%", padding: "14px 16px", background: "#0f172a", border: "2px solid #1e293b",
+        borderRadius: 14, color: "#e2e8f0", fontSize: 15, outline: "none", resize: large ? "vertical" : "none",
+        fontFamily: "inherit", boxSizing: "border-box", transition: "border-color 0.2s",
+      },
+      onFocus: function(e) { e.target.style.borderColor = "#8b5cf6"; },
+      onBlur: function(e) { e.target.style.borderColor = "#1e293b"; },
+    })
+  );
+}
+
+function SectionHeader({ children, sub, icon }) {
+  return h("div", { style: { marginBottom: 14, marginTop: 28 } },
+    h("h3", { style: { margin: 0, fontSize: 16, fontWeight: 700, color: "#e2e8f0", display: "flex", alignItems: "center", gap: 8 } },
+      icon && h("span", { style: { fontSize: 20 } }, icon),
+      children
+    ),
+    sub && h("p", { style: { margin: "4px 0 0", fontSize: 13, color: "#64748b" } }, sub)
+  );
+}
+
+function NextButton({ onClick, label, disabled, color }) {
+  return h("button", {
+    onClick: onClick,
+    disabled: disabled,
+    style: {
+      width: "100%", padding: "18px 24px", borderRadius: 16, border: "none", fontSize: 17, fontWeight: 700,
+      cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1,
+      background: disabled ? "#334155" : "linear-gradient(135deg, " + (color || "#8b5cf6") + ", " + (color ? color + "cc" : "#6366f1") + ")",
+      color: "#fff", transition: "all 0.2s", marginTop: 32,
+      boxShadow: disabled ? "none" : "0 4px 20px " + (color || "#8b5cf6") + "40",
+    }
+  }, label + " →");
+}
+
+function Card({ children, style, glow }) {
+  return h("div", {
+    style: Object.assign({
+      background: "#0f172a", border: "1.5px solid " + (glow || "#1e293b"), borderRadius: 16, padding: 18,
+      marginBottom: 12,
+    }, glow ? { boxShadow: "0 0 20px " + glow + "20" } : {}, style || {})
+  }, children);
+}
+
+function CopyBtn({ text }) {
+  var _s = useState(false), copied = _s[0], setCopied = _s[1];
+  return h("button", {
+    onClick: function() { navigator.clipboard.writeText(text); setCopied(true); setTimeout(function() { setCopied(false); }, 1500); },
+    style: { background: copied ? "#14532d" : "#1e293b", border: "1px solid #334155", borderRadius: 10, padding: "6px 14px", color: copied ? "#86efac" : "#94a3b8", fontSize: 13, cursor: "pointer", fontWeight: 600, transition: "all 0.2s" }
+  }, copied ? "✓ Copied!" : "\u{1f4cb} Copy");
+}
+
+// ─── PROGRESS BAR ─────────────────────────────────────────
+
+function ProgressBar({ step, total }) {
+  return h("div", { style: { marginBottom: 24 } },
+    h("div", { style: { display: "flex", gap: 4, marginBottom: 8 } },
+      STEP_CONFIG.slice(0, total).map(function(s, i) {
+        return h("div", {
+          key: i,
+          style: {
+            flex: 1, height: 6, borderRadius: 99, transition: "all 0.4s",
+            background: i < step ? s.color : i === step ? s.color : "#1e293b",
+            opacity: i <= step ? 1 : 0.3,
+          }
+        });
+      })
+    ),
+    h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
+      h("span", { style: { fontSize: 13, color: (STEP_CONFIG[step] && STEP_CONFIG[step].color) || "#8b5cf6", fontWeight: 600 } },
+        (STEP_CONFIG[step] && STEP_CONFIG[step].icon) + " " + (STEP_CONFIG[step] && STEP_CONFIG[step].label)
+      ),
+      h("span", { style: { fontSize: 12, color: "#64748b", fontWeight: 500 } }, "Step " + (step + 1) + " of " + total)
+    )
+  );
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────
+
+function App() {
+  var _view = useState("home"), view = _view[0], setView = _view[1];
+  var _tab = useState("create"), tab = _tab[0], setTab = _tab[1];
+  var _step = useState(0), step = _step[0], setStep = _step[1];
+  var _projects = useState([]), projects = _projects[0], setProjects = _projects[1];
+
+  // ── Form state ──
+  var _ctx = useState({ brand: "", offer: "", platform: "", audience: "", want: "", problem: "", feelings: [], goal: "" }), ctx = _ctx[0], setCtx = _ctx[1];
+  var _sel = useState({ idea: "", checks: { proven: false, audience: false, native: false, productFit: false } }), sel = _sel[0], setSel = _sel[1];
+  var _build = useState({ hookType: "", hookDraft: "", hookChecks: { under2: false, noProduct: false, tension: false, relevance: false }, identity: "", authority: "", tensionSrc: "", storyHook: "", storyProblem: "", storyEscalation: "", storyPayoff: "" }), build = _build[0], setBuild = _build[1];
+  var _creative = useState({ reallyAbout: "", sentence: "", setting: "", subject: "", action: "", keyObject: "", mood: "", nativeStyle: "" }), creative = _creative[0], setCreative = _creative[1];
+  var _prompt = useState({ text: "", checks: { native: false, focal: false, scrollStop: false, interrupt: false, framing: false, noPolish: false } }), prompt = _prompt[0], setPrompt = _prompt[1];
+  var _visual = useState({ opening: { face: false, movement: false, focal: false, noClutter: false }, native: { organic: false, feedNative: false, mobile: false }, interrupt: { unexpected: false, contrast: false, motion: false }, text: { large: false, fastRead: false, minimal: false }, product: { delayed: false, natural: false, nonSalesy: false } }), visual = _visual[0], setVisual = _visual[1];
+  var _validate = useState({ retention: { noDeadSpace: false, newInfo: false, tightEdits: false, captions: false }, share: { lookSmart: false, oneSentence: false, socialCurrency: false }, rules: { familiarity: false, curiosity: false, productLater: false, everySecond: false, repeatWinners: false } }), validate = _validate[0], setValidate = _validate[1];
+
+  var resetAll = function() {
+    setStep(0);
+    setCtx({ brand: "", offer: "", platform: "", audience: "", want: "", problem: "", feelings: [], goal: "" });
+    setSel({ idea: "", checks: { proven: false, audience: false, native: false, productFit: false } });
+    setBuild({ hookType: "", hookDraft: "", hookChecks: { under2: false, noProduct: false, tension: false, relevance: false }, identity: "", authority: "", tensionSrc: "", storyHook: "", storyProblem: "", storyEscalation: "", storyPayoff: "" });
+    setCreative({ reallyAbout: "", sentence: "", setting: "", subject: "", action: "", keyObject: "", mood: "", nativeStyle: "" });
+    setPrompt({ text: "", checks: { native: false, focal: false, scrollStop: false, interrupt: false, framing: false, noPolish: false } });
+    setVisual({ opening: { face: false, movement: false, focal: false, noClutter: false }, native: { organic: false, feedNative: false, mobile: false }, interrupt: { unexpected: false, contrast: false, motion: false }, text: { large: false, fastRead: false, minimal: false }, product: { delayed: false, natural: false, nonSalesy: false } });
+    setValidate({ retention: { noDeadSpace: false, newInfo: false, tightEdits: false, captions: false }, share: { lookSmart: false, oneSentence: false, socialCurrency: false }, rules: { familiarity: false, curiosity: false, productLater: false, everySecond: false, repeatWinners: false } });
+    setView("wizard");
+  };
+
+  var calcScore = function(checks) {
+    var vals = Object.values(checks);
+    return vals.length === 0 ? 0 : Math.round((vals.filter(Boolean).length / vals.length) * 100);
+  };
+
+  var selectionScore = calcScore(sel.checks);
+  var hookScore = calcScore(build.hookChecks);
+  var promptScore = calcScore(prompt.checks);
+  var visualScore = Math.round(((Object.values(visual.opening).filter(Boolean).length + Object.values(visual.native).filter(Boolean).length + Object.values(visual.interrupt).filter(Boolean).length + Object.values(visual.text).filter(Boolean).length + Object.values(visual.product).filter(Boolean).length) / 15) * 100);
+  var validateScore = Math.round(((Object.values(validate.retention).filter(Boolean).length + Object.values(validate.share).filter(Boolean).length + Object.values(validate.rules).filter(Boolean).length) / 12) * 100);
+
+  var generatePrompt = useCallback(function() {
+    var parts = [];
+    if (creative.nativeStyle) parts.push("Style: " + creative.nativeStyle + " content.");
+    if (creative.setting) parts.push("Setting: " + creative.setting + ".");
+    if (creative.subject) parts.push("Subject: " + creative.subject + ".");
+    if (creative.action) parts.push("Action: " + creative.action + ".");
+    if (creative.keyObject) parts.push("Key object: " + creative.keyObject + ".");
+    if (creative.mood) parts.push("Mood: " + creative.mood + ".");
+    if (ctx.platform) parts.push("Optimized for " + ctx.platform + ".");
+    if (creative.reallyAbout) parts.push("Core message: " + creative.reallyAbout + ".");
+    parts.push("Shot on iPhone. Natural lighting. No polished ad feel. Raw and authentic. Tight framing. Scroll-stopping first frame.");
+    setPrompt(function(p) { return Object.assign({}, p, { text: parts.join("\n\n") }); });
+  }, [creative, ctx.platform]);
+
+  var saveProject = function() {
+    var p = { id: Date.now(), name: ctx.brand || "Untitled", date: new Date().toLocaleDateString(), platform: ctx.platform, score: validateScore, ctx: ctx, sel: sel, build: build, creative: creative, prompt: prompt, visual: visual, validate: validate };
+    setProjects(function(prev) { return [p].concat(prev); });
+  };
+
+  // ─── SCREEN 0: TELL ME ABOUT IT ────────────────────────
+
+  var ContextScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f4dd} Tell Me About It"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "First, let's get the basics down. What are you making content for?"),
+
+      h(SectionHeader, { icon: "\u{1f3f7}️", sub: "What's the name of your brand or project?" }, "Your Brand"),
+      h(TextInput, { label: "Brand or Project Name", value: ctx.brand, onChange: function(v) { setCtx(Object.assign({}, ctx, { brand: v })); }, placeholder: "e.g. GlowSkin, My Etsy Shop, My Music" }),
+      h(TextInput, { label: "What are you selling or promoting?", value: ctx.offer, onChange: function(v) { setCtx(Object.assign({}, ctx, { offer: v })); }, placeholder: "e.g. A 30-day acne treatment kit", hint: "This is the thing you want people to know about" }),
+
+      h(SectionHeader, { icon: "\u{1f4f1}", sub: "Pick the app where this content will be posted" }, "Where Will This Go?"),
+      h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+        PLATFORMS.map(function(p) {
+          return h(BigChoice, { key: p.id, selected: ctx.platform, onSelect: function(v) { setCtx(Object.assign({}, ctx, { platform: v })); }, label: p.label, icon: p.icon, color: p.color });
+        })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f3af}", sub: "Who are you trying to reach?" }, "Your Audience"),
+      h(TextInput, { label: "Who is this for?", value: ctx.audience, onChange: function(v) { setCtx(Object.assign({}, ctx, { audience: v })); }, placeholder: "e.g. Women 18-25 who deal with acne", hint: "Describe the type of person you want watching" }),
+      h(TextInput, { label: "What do they want?", value: ctx.want, onChange: function(v) { setCtx(Object.assign({}, ctx, { want: v })); }, placeholder: "e.g. Clear skin without harsh chemicals", hint: "What's the #1 thing they wish they had?" }),
+      h(TextInput, { label: "What's their biggest struggle?", value: ctx.problem, onChange: function(v) { setCtx(Object.assign({}, ctx, { problem: v })); }, placeholder: "e.g. They're embarrassed and have tried everything", hint: "What problem keeps them up at night?" }),
+
+      h(SectionHeader, { icon: "\u{1f4ab}", sub: "How should your viewer FEEL after watching?" }, "The Feeling"),
+      h("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
+        FEELINGS.map(function(f) {
+          return h(TagPill, {
+            key: f.label, label: f.label, icon: f.icon, active: ctx.feelings.includes(f.label),
+            onClick: function() { setCtx(Object.assign({}, ctx, { feelings: ctx.feelings.includes(f.label) ? ctx.feelings.filter(function(x) { return x !== f.label; }) : ctx.feelings.concat([f.label]) })); }
+          });
+        })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f3af}", sub: "What's the ONE thing you want this content to do?" }, "Your Goal"),
+      h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+        GOALS.map(function(g) {
+          return h(BigChoice, { key: g.label, selected: ctx.goal, onSelect: function(v) { setCtx(Object.assign({}, ctx, { goal: v })); }, label: g.label, icon: g.icon, desc: g.desc, color: "#8b5cf6" });
+        })
+      ),
+
+      h(NextButton, { onClick: function() { setStep(1); }, label: "Next: Check Your Idea", color: STEP_CONFIG[1].color })
+    );
+  };
+
+  // ─── SCREEN 1: IS THIS A GOOD IDEA? ────────────────────
+
+  var SelectScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f914} Is This a Good Idea?"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Before you spend time making it, let's make sure this idea is worth building."),
+
+      h(TextInput, { label: "Describe your content idea", value: sel.idea, onChange: function(v) { setSel(Object.assign({}, sel, { idea: v })); }, placeholder: "Tell me what your video/post is about in a few sentences...", hint: "Don't worry about making it perfect — just get the idea out", large: true }),
+
+      h(SectionHeader, { icon: "✅", sub: "Check each box if it's true. You need at least 3 out of 4 to move on." }, "Idea Checklist"),
+      h(Card, null,
+        h(CheckItem, { label: "This type of content already works", hint: "Have you seen similar videos get lots of views?", checked: sel.checks.proven, onChange: function(v) { setSel(Object.assign({}, sel, { checks: Object.assign({}, sel.checks, { proven: v }) })); } }),
+        h(CheckItem, { label: "My audience already watches this stuff", hint: "Would the people you're targeting actually stop for this?", checked: sel.checks.audience, onChange: function(v) { setSel(Object.assign({}, sel, { checks: Object.assign({}, sel.checks, { audience: v }) })); } }),
+        h(CheckItem, { label: "It fits the platform", hint: "Does it look like something you'd naturally see on this app?", checked: sel.checks.native, onChange: function(v) { setSel(Object.assign({}, sel, { checks: Object.assign({}, sel.checks, { native: v }) })); } }),
+        h(CheckItem, { label: "My product fits in naturally", hint: "Can you mention your product without it feeling forced?", checked: sel.checks.productFit, onChange: function(v) { setSel(Object.assign({}, sel, { checks: Object.assign({}, sel.checks, { productFit: v }) })); } })
+      ),
+
+      h(ScoreMeter, { score: selectionScore, label: "Idea Strength" }),
+
+      selectionScore > 0 && selectionScore <= 50 &&
+        h(Card, { style: { marginTop: 16 }, glow: "#ef4444" },
+          h("p", { style: { color: "#fca5a5", fontSize: 14, margin: 0, fontWeight: 500 } },
+            "⚠️ This idea needs work. Try picking a format that already gets lots of views, or make sure your audience would actually stop scrolling for this."
+          )
+        ),
+
+      h(NextButton, {
+        onClick: function() { setStep(2); },
+        label: selectionScore < 50 ? "Score too low — fix your idea first" : "Next: Build Your Hook",
+        disabled: selectionScore < 50,
+        color: STEP_CONFIG[2].color,
+      })
+    );
+  };
+
+  // ─── SCREEN 2: BUILD YOUR HOOK ──────────────────────────
+
+  var BuildScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1fa9d} Build Your Hook"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "The hook is the first thing people see. It decides if they keep watching or scroll past."),
+
+      h(SectionHeader, { icon: "\u{1f3a3}", sub: "Pick ONE way to grab attention in the first 2 seconds" }, "Hook Type"),
+      h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+        HOOK_TYPES.map(function(ht) {
+          return h(BigChoice, { key: ht.label, selected: build.hookType, onSelect: function(v) { setBuild(Object.assign({}, build, { hookType: v })); }, label: ht.label, icon: ht.icon, desc: ht.desc + " — " + ht.example, color: "#3b82f6" });
+        })
+      ),
+
+      h(SectionHeader, { icon: "✍️", sub: "Write your opening line — what do people see/hear first?" }, "Write Your Hook"),
+      h(TextInput, { label: "Your Hook Line", value: build.hookDraft, onChange: function(v) { setBuild(Object.assign({}, build, { hookDraft: v })); }, placeholder: "e.g. 'Nobody talks about this skincare hack...'", hint: "Keep it short! Under 2 seconds when said out loud." }),
+
+      h(SectionHeader, { icon: "✅", sub: "Check each rule your hook follows" }, "Hook Rules"),
+      h(Card, null,
+        h(CheckItem, { label: "Takes under 2 seconds to say", hint: "Say it out loud — is it quick?", checked: build.hookChecks.under2, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { under2: v }) })); } }),
+        h(CheckItem, { label: "Doesn't mention the product yet", hint: "Save the product reveal for later", checked: build.hookChecks.noProduct, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { noProduct: v }) })); } }),
+        h(CheckItem, { label: "Makes people curious", hint: "Do they NEED to know what happens next?", checked: build.hookChecks.tension, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { tension: v }) })); } }),
+        h(CheckItem, { label: "Clearly about something they care about", hint: "Is the topic obviously relevant to your audience?", checked: build.hookChecks.relevance, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { relevance: v }) })); } })
+      ),
+      h(ScoreMeter, { score: hookScore, label: "Hook Strength" }),
+
+      h(SectionHeader, { icon: "\u{1f9e0}", sub: "These make your content stick in people's heads" }, "The Secret Sauce"),
+      h(TextInput, { label: "Who does the viewer become?", value: build.identity, onChange: function(v) { setBuild(Object.assign({}, build, { identity: v })); }, placeholder: "e.g. Someone who knows the secret", hint: "After watching, they feel like a new version of themselves" }),
+      h(TextInput, { label: "Why should they trust you?", value: build.authority, onChange: function(v) { setBuild(Object.assign({}, build, { authority: v })); }, placeholder: "e.g. 'As someone who struggled with acne for 10 years...'", hint: "What makes YOU the right person to talk about this?" }),
+      h(TextInput, { label: "What makes them NEED to keep watching?", value: build.tensionSrc, onChange: function(v) { setBuild(Object.assign({}, build, { tensionSrc: v })); }, placeholder: "e.g. They don't know the answer yet", hint: "The open question that keeps them hooked" }),
+
+      h(SectionHeader, { icon: "\u{1f4d6}", sub: "Plan your story in 4 parts — like a mini movie" }, "Story Outline"),
+      h(TextInput, { label: "1. Opening moment", value: build.storyHook, onChange: function(v) { setBuild(Object.assign({}, build, { storyHook: v })); }, placeholder: "What happens first?", hint: "The scene that grabs attention" }),
+      h(TextInput, { label: "2. The problem", value: build.storyProblem, onChange: function(v) { setBuild(Object.assign({}, build, { storyProblem: v })); }, placeholder: "What's the struggle?", hint: "What goes wrong or what's the challenge?" }),
+      h(TextInput, { label: "3. It gets bigger", value: build.storyEscalation, onChange: function(v) { setBuild(Object.assign({}, build, { storyEscalation: v })); }, placeholder: "How does it get more intense?", hint: "Raise the stakes — make people lean in" }),
+      h(TextInput, { label: "4. The payoff", value: build.storyPayoff, onChange: function(v) { setBuild(Object.assign({}, build, { storyPayoff: v })); }, placeholder: "The satisfying ending", hint: "The reveal, the win, the surprise" }),
+
+      h(NextButton, { onClick: function() { setStep(3); }, label: "Next: Set the Scene", color: STEP_CONFIG[3].color })
+    );
+  };
+
+  // ─── SCREEN 3: SET THE SCENE ────────────────────────────
+
+  var CreativeScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f3a8} Set the Scene"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Now let's figure out what this actually looks like. Close your eyes and picture it."),
+
+      h(SectionHeader, { icon: "\u{1f48e}", sub: "What's the REAL message behind this content?" }, "The Deeper Meaning"),
+      h(TextInput, { label: "What is this really about?", value: creative.reallyAbout, onChange: function(v) { setCreative(Object.assign({}, creative, { reallyAbout: v })); }, placeholder: "e.g. It's about feeling confident in your own skin", hint: "Not the surface level — the deeper truth" }),
+
+      h(Card, { glow: "#6366f1" },
+        h("p", { style: { fontSize: 14, color: "#a5b4fc", margin: "0 0 10px", fontWeight: 600 } }, "\u{1f3af} Sum it up in one sentence:"),
+        h(TextInput, { label: "", value: creative.sentence, onChange: function(v) { setCreative(Object.assign({}, creative, { sentence: v })); }, placeholder: "This content shows ___ dealing with ___ and discovering ___" })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f3ac}", sub: "Describe what we'd actually SEE in the video" }, "What Does It Look Like?"),
+      h(TextInput, { label: "Where does it happen?", value: creative.setting, onChange: function(v) { setCreative(Object.assign({}, creative, { setting: v })); }, placeholder: "e.g. Bathroom mirror, kitchen, gym", hint: "The location or background" }),
+      h(TextInput, { label: "Who's in it?", value: creative.subject, onChange: function(v) { setCreative(Object.assign({}, creative, { subject: v })); }, placeholder: "e.g. A girl in her 20s, me, a group of friends", hint: "The person or people on camera" }),
+      h(TextInput, { label: "What are they doing?", value: creative.action, onChange: function(v) { setCreative(Object.assign({}, creative, { action: v })); }, placeholder: "e.g. Looking in the mirror, trying the product", hint: "The main action happening" }),
+      h(TextInput, { label: "What's the key object?", value: creative.keyObject, onChange: function(v) { setCreative(Object.assign({}, creative, { keyObject: v })); }, placeholder: "e.g. The skincare bottle, before/after photos", hint: "The ONE thing viewers should notice" }),
+      h(TextInput, { label: "What's the vibe?", value: creative.mood, onChange: function(v) { setCreative(Object.assign({}, creative, { mood: v })); }, placeholder: "e.g. Raw, energetic, calm, funny", hint: "The overall feeling of the video" }),
+
+      h(SectionHeader, { icon: "\u{1f3a5}", sub: "Pick the style that fits your content best" }, "Filming Style"),
+      h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+        NATIVE_STYLES.map(function(s) {
+          return h(BigChoice, { key: s.label, selected: creative.nativeStyle, onSelect: function(v) { setCreative(Object.assign({}, creative, { nativeStyle: v })); }, label: s.label, icon: s.icon, desc: s.desc, color: "#0ea5e9" });
+        })
+      ),
+
+      h(NextButton, { onClick: function() { generatePrompt(); setStep(4); }, label: "Next: Generate AI Recipe", color: STEP_CONFIG[4].color })
+    );
+  };
+
+  // ─── SCREEN 4: YOUR AI RECIPE ───────────────────────────
+
+  var PromptScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f916} Your AI Recipe"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "We turned all your answers into an AI prompt. You can copy this and paste it into any AI tool to generate images or video."),
+
+      h(Card, { glow: "#14b8a6" },
+        h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } },
+          h("span", { style: { fontSize: 15, fontWeight: 700, color: "#e2e8f0" } }, "✨ Generated Prompt"),
+          h(CopyBtn, { text: prompt.text })
+        ),
+        h("textarea", {
+          value: prompt.text,
+          onChange: function(e) { setPrompt(Object.assign({}, prompt, { text: e.target.value })); },
+          rows: 10,
+          style: { width: "100%", background: "#020617", border: "1.5px solid #1e293b", borderRadius: 12, padding: 14, color: "#e2e8f0", fontSize: 14, fontFamily: "monospace", resize: "vertical", outline: "none", boxSizing: "border-box" }
+        }),
+        h("p", { style: { fontSize: 12, color: "#64748b", margin: "8px 0 0" } }, "You can edit this! Change anything you want before copying.")
+      ),
+
+      h(SectionHeader, { icon: "✅", sub: "Check each quality your prompt has" }, "Prompt Quality Check"),
+      h(Card, null,
+        h(CheckItem, { label: "Fits the platform", hint: "Would this look natural on the app you chose?", checked: prompt.checks.native, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { native: v }) })); } }),
+        h(CheckItem, { label: "Has a clear focus point", hint: "Is there ONE thing the eye is drawn to?", checked: prompt.checks.focal, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { focal: v }) })); } }),
+        h(CheckItem, { label: "First frame stops the scroll", hint: "Would someone pause on the very first image?", checked: prompt.checks.scrollStop, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { scrollStop: v }) })); } }),
+        h(CheckItem, { label: "Has a surprise element", hint: "Is there something unexpected that catches the eye?", checked: prompt.checks.interrupt, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { interrupt: v }) })); } }),
+        h(CheckItem, { label: "Good framing / camera angle", hint: "Is the shot interesting, not boring?", checked: prompt.checks.framing, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { framing: v }) })); } }),
+        h(CheckItem, { label: "Doesn't look like an ad", hint: "It should feel real, not polished or salesy", checked: prompt.checks.noPolish, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { noPolish: v }) })); } })
+      ),
+      h(ScoreMeter, { score: promptScore, label: "Prompt Quality" }),
+
+      h(NextButton, { onClick: function() { setStep(5); }, label: "Next: Visual Checklist", color: STEP_CONFIG[5].color })
+    );
+  };
+
+  // ─── SCREEN 5: PICTURE PERFECT ──────────────────────────
+
+  var VisualScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f441}️ Picture Perfect"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Check your visuals against what actually works. The more boxes you check, the better your content will perform."),
+
+      h(SectionHeader, { icon: "\u{1f5bc}️", sub: "What people see in the VERY first moment" }, "Opening Frame"),
+      h(Card, null,
+        h(CheckItem, { label: "Shows a face or action", hint: "People stop scrolling for faces and movement", checked: visual.opening.face, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { face: v }) })); } }),
+        h(CheckItem, { label: "Something is moving right away", hint: "Still images get skipped — movement wins", checked: visual.opening.movement, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { movement: v }) })); } }),
+        h(CheckItem, { label: "One clear thing to look at", hint: "Don't confuse the eye with too much", checked: visual.opening.focal, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { focal: v }) })); } }),
+        h(CheckItem, { label: "Background isn't messy", hint: "Clean background = all attention on your content", checked: visual.opening.noClutter, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { noClutter: v }) })); } })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f4f1}", sub: "Does it look like a regular post, not an ad?" }, "Looks Real"),
+      h(Card, null,
+        h(CheckItem, { label: "Looks like a real person made it", hint: "Not too perfect, not too produced", checked: visual.native.organic, onChange: function(v) { setVisual(Object.assign({}, visual, { native: Object.assign({}, visual.native, { organic: v }) })); } }),
+        h(CheckItem, { label: "Blends into the feed", hint: "If you scrolled past it, you'd think it was a normal post", checked: visual.native.feedNative, onChange: function(v) { setVisual(Object.assign({}, visual, { native: Object.assign({}, visual.native, { feedNative: v }) })); } }),
+        h(CheckItem, { label: "Made for phone screens", hint: "Vertical, close-up, easy to see on small screens", checked: visual.native.mobile, onChange: function(v) { setVisual(Object.assign({}, visual, { native: Object.assign({}, visual.native, { mobile: v }) })); } })
+      ),
+
+      h(SectionHeader, { icon: "⚡", sub: "What makes someone stop scrolling?" }, "Surprise Factor"),
+      h(Card, null,
+        h(CheckItem, { label: "Something unexpected", hint: "A weird detail, surprising reveal, or unusual angle", checked: visual.interrupt.unexpected, onChange: function(v) { setVisual(Object.assign({}, visual, { interrupt: Object.assign({}, visual.interrupt, { unexpected: v }) })); } }),
+        h(CheckItem, { label: "Strong contrast", hint: "Bright vs dark, big vs small, before vs after", checked: visual.interrupt.contrast, onChange: function(v) { setVisual(Object.assign({}, visual, { interrupt: Object.assign({}, visual.interrupt, { contrast: v }) })); } }),
+        h(CheckItem, { label: "Eye-catching motion", hint: "Something that pops or moves in a surprising way", checked: visual.interrupt.motion, onChange: function(v) { setVisual(Object.assign({}, visual, { interrupt: Object.assign({}, visual.interrupt, { motion: v }) })); } })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f4ac}", sub: "If your video has text on screen" }, "Text on Screen"),
+      h(Card, null,
+        h(CheckItem, { label: "Big enough to read easily", hint: "Can you read it without squinting?", checked: visual.text.large, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { large: v }) })); } }),
+        h(CheckItem, { label: "Can be read in 1-2 seconds", hint: "Short phrases, not paragraphs", checked: visual.text.fastRead, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { fastRead: v }) })); } }),
+        h(CheckItem, { label: "Not too much text", hint: "Less is more — let the video do the talking", checked: visual.text.minimal, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { minimal: v }) })); } })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f6cd}️", sub: "How and when your product shows up" }, "Product Placement"),
+      h(Card, null,
+        h(CheckItem, { label: "Product doesn't show up too early", hint: "Tease first, reveal later", checked: visual.product.delayed, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { delayed: v }) })); } }),
+        h(CheckItem, { label: "Product appears naturally", hint: "Not shoved in your face — part of the story", checked: visual.product.natural, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { natural: v }) })); } }),
+        h(CheckItem, { label: "Doesn't feel like a commercial", hint: "Would you share this even if it wasn't selling something?", checked: visual.product.nonSalesy, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { nonSalesy: v }) })); } })
+      ),
+
+      h(ScoreMeter, { score: visualScore, label: "Visual Score" }),
+
+      h(NextButton, { onClick: function() { setStep(6); }, label: "Next: Final Check", color: STEP_CONFIG[6].color })
+    );
+  };
+
+  // ─── SCREEN 6: FINAL CHECK ──────────────────────────────
+
+  var ValidateScreen = function() {
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "✅ Final Check"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Last step before you're ready to go! This is your go/no-go checklist."),
+
+      h(SectionHeader, { icon: "⏱️", sub: "Will people watch the whole thing?" }, "Will They Keep Watching?"),
+      h(Card, null,
+        h(CheckItem, { label: "No boring parts", hint: "Every single second has something interesting", checked: validate.retention.noDeadSpace, onChange: function(v) { setValidate(Object.assign({}, validate, { retention: Object.assign({}, validate.retention, { noDeadSpace: v }) })); } }),
+        h(CheckItem, { label: "Something new every 1-3 seconds", hint: "New info, new visual, new twist", checked: validate.retention.newInfo, onChange: function(v) { setValidate(Object.assign({}, validate, { retention: Object.assign({}, validate.retention, { newInfo: v }) })); } }),
+        h(CheckItem, { label: "No parts that drag on", hint: "Cut everything that doesn't earn its place", checked: validate.retention.tightEdits, onChange: function(v) { setValidate(Object.assign({}, validate, { retention: Object.assign({}, validate.retention, { tightEdits: v }) })); } }),
+        h(CheckItem, { label: "Has captions/subtitles", hint: "Most people watch without sound!", checked: validate.retention.captions, onChange: function(v) { setValidate(Object.assign({}, validate, { retention: Object.assign({}, validate.retention, { captions: v }) })); } })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f504}", sub: "Will people send this to their friends?" }, "Will They Share It?"),
+      h(Card, null,
+        h(CheckItem, { label: "Makes the sharer look smart", hint: "People share things that make THEM look good", checked: validate.share.lookSmart, onChange: function(v) { setValidate(Object.assign({}, validate, { share: Object.assign({}, validate.share, { lookSmart: v }) })); } }),
+        h(CheckItem, { label: "Easy to explain in one sentence", hint: "'Dude you gotta see this video about ___'", checked: validate.share.oneSentence, onChange: function(v) { setValidate(Object.assign({}, validate, { share: Object.assign({}, validate.share, { oneSentence: v }) })); } }),
+        h(CheckItem, { label: "Feels like insider knowledge", hint: "Like knowing something most people don't", checked: validate.share.socialCurrency, onChange: function(v) { setValidate(Object.assign({}, validate, { share: Object.assign({}, validate.share, { socialCurrency: v }) })); } })
+      ),
+
+      h(SectionHeader, { icon: "\u{1f4cf}", sub: "The golden rules of viral content" }, "Content Rules"),
+      h(Card, null,
+        h(CheckItem, { label: "Familiar format, fresh take", hint: "Use a format people already love, but make it yours", checked: validate.rules.familiarity, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { familiarity: v }) })); } }),
+        h(CheckItem, { label: "Curiosity comes before explanation", hint: "Make them wonder BEFORE you give answers", checked: validate.rules.curiosity, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { curiosity: v }) })); } }),
+        h(CheckItem, { label: "Product comes later, not first", hint: "Hook them with the story, then show the product", checked: validate.rules.productLater, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { productLater: v }) })); } }),
+        h(CheckItem, { label: "Every second earns its place", hint: "If you can cut it without losing anything, cut it", checked: validate.rules.everySecond, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { everySecond: v }) })); } }),
+        h(CheckItem, { label: "Based on something that already worked", hint: "Remix winners — don't reinvent the wheel", checked: validate.rules.repeatWinners, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { repeatWinners: v }) })); } })
+      ),
+
+      h(ScoreMeter, { score: validateScore, label: "\u{1f3af} Viral Probability" }),
+
+      validateScore >= 75 &&
+        h(Card, { style: { marginTop: 16, textAlign: "center" }, glow: "#22c55e" },
+          h("span", { style: { fontSize: 32 } }, "\u{1f525}"),
+          h("p", { style: { color: "#86efac", fontSize: 16, fontWeight: 700, margin: "8px 0 4px" } }, "This looks STRONG!"),
+          h("p", { style: { color: "#64748b", fontSize: 13, margin: 0 } }, "You're ready to produce this content.")
+        ),
+      validateScore > 0 && validateScore < 50 &&
+        h(Card, { style: { marginTop: 16, textAlign: "center" }, glow: "#ef4444" },
+          h("span", { style: { fontSize: 32 } }, "\u{1f527}"),
+          h("p", { style: { color: "#fca5a5", fontSize: 16, fontWeight: 700, margin: "8px 0 4px" } }, "Needs more work"),
+          h("p", { style: { color: "#64748b", fontSize: 13, margin: 0 } }, "Go back and strengthen the weak areas.")
+        ),
+
+      h("div", { style: { display: "flex", gap: 10, marginTop: 32 } },
+        h("button", {
+          onClick: function() { setStep(2); },
+          style: { flex: 1, padding: "16px", borderRadius: 14, border: "2px solid #7f1d1d", background: "transparent", color: "#fca5a5", fontSize: 15, fontWeight: 700, cursor: "pointer" }
+        }, "← Go Back & Fix"),
+        h("button", {
+          onClick: function() { saveProject(); setStep(7); },
+          style: {
+            flex: 2, padding: "16px", borderRadius: 14, border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer",
+            background: validateScore >= 50 ? "linear-gradient(135deg, #22c55e, #16a34a)" : "#334155",
+            color: validateScore >= 50 ? "#fff" : "#64748b",
+            boxShadow: validateScore >= 50 ? "0 4px 20px #22c55e40" : "none",
+          }
+        }, "Approve & Finish ✓")
+      )
+    );
+  };
+
+  // ─── SCREEN 7: YOUR CONTENT PACK ────────────────────────
+
+  var OutputScreen = function() {
+    var brief = "CREATIVE BRIEF\n" + "═".repeat(35) + "\n\nBrand: " + ctx.brand + "\nOffer: " + ctx.offer + "\nPlatform: " + ctx.platform + "\nAudience: " + ctx.audience + "\nGoal: " + ctx.goal + "\n\nHook: " + build.storyHook + "\nHook Type: " + build.hookType + "\n\nStory:\n1. Opening: " + build.storyHook + "\n2. Problem: " + build.storyProblem + "\n3. Escalation: " + build.storyEscalation + "\n4. Payoff: " + build.storyPayoff + "\n\nStyle: " + creative.nativeStyle + "\nSetting: " + creative.setting + "\nSubject: " + creative.subject + "\nMood: " + creative.mood + "\n\nCore Message: " + creative.reallyAbout + "\n\nViral Score: " + validateScore + "/100";
+
+    var shotList = "SHOT LIST\n" + "═".repeat(35) + "\n\n\u{1f3ac} SHOT 1 — OPENING (0-2s)\n" + build.storyHook + "\nStyle: " + creative.nativeStyle + "\nSetting: " + creative.setting + "\n\n\u{1f3ac} SHOT 2 — THE PROBLEM (2-5s)\n" + build.storyProblem + "\n\n\u{1f3ac} SHOT 3 — IT GETS BIGGER (5-10s)\n" + build.storyEscalation + "\n\n\u{1f3ac} SHOT 4 — THE PAYOFF (10-15s)\n" + build.storyPayoff + "\nProduct: " + ctx.offer;
+
+    var hooks = [
+      build.hookDraft,
+      build.hookDraft ? "What if I told you " + build.hookDraft.toLowerCase() : "",
+      build.hookDraft ? "Nobody talks about this: " + build.hookDraft.toLowerCase() : "",
+      build.hookDraft ? "POV: " + build.hookDraft : "",
+    ].filter(Boolean);
+
+    var captions = [
+      build.storyHook + " " + (ctx.brand ? "#" + ctx.brand.replace(/\s/g, "") : "") + " #viral",
+      "This changed everything. " + (ctx.platform === "TikTok" ? "#fyp #foryou" : "#reels #explore"),
+      "Save this for later. You'll need it. " + (ctx.brand ? "#" + ctx.brand.replace(/\s/g, "") : ""),
+    ];
+
+    return h("div", null,
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f381} Your Content Pack"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Everything you need to make and post your content. Copy each section!"),
+
+      h(Card, { glow: "#22c55e" },
+        h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
+          h("div", null,
+            h("span", { style: { fontSize: 15, fontWeight: 700, color: "#86efac" } }, "✓ Ready to Go!"),
+            h("p", { style: { fontSize: 12, color: "#64748b", margin: "4px 0 0" } }, ctx.brand + " — " + ctx.platform)
+          ),
+          h("span", { style: { fontSize: 28, fontWeight: 800, color: "#22c55e" } }, validateScore + "/100")
+        )
+      ),
+
+      // Deliverables
+      [
+        { title: "\u{1f4c4} Creative Brief", desc: "The full plan for your content", content: brief },
+        { title: "\u{1f916} AI Prompt", desc: "Paste this into any AI image/video tool", content: prompt.text },
+        { title: "\u{1f3ac} Shot List", desc: "Step-by-step filming guide", content: shotList },
+      ].map(function(item, i) {
+        return h(Card, { key: i, style: { marginTop: 8 } },
+          h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 } },
+            h("div", null,
+              h("span", { style: { fontSize: 15, fontWeight: 700, color: "#e2e8f0" } }, item.title),
+              h("p", { style: { fontSize: 12, color: "#64748b", margin: "2px 0 0" } }, item.desc)
+            ),
+            h(CopyBtn, { text: item.content })
+          ),
+          h("pre", { style: { background: "#020617", padding: 14, borderRadius: 10, fontSize: 12, color: "#94a3b8", overflow: "auto", maxHeight: 140, margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 } }, item.content)
+        );
+      }),
+
+      // Hook Variations
+      h(SectionHeader, { icon: "\u{1f3a3}", sub: "Different ways to start your content" }, "Hook Variations"),
+      h(Card, null,
+        hooks.map(function(hk, i) {
+          return h("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < hooks.length - 1 ? "1px solid #1e293b" : "none" } },
+            h("span", { style: { fontSize: 14, color: "#e2e8f0" } }, (i + 1) + ". " + hk),
+            h(CopyBtn, { text: hk })
+          );
+        })
+      ),
+
+      // Captions
+      h(SectionHeader, { icon: "\u{1f4ac}", sub: "Ready-to-paste captions for your post" }, "Caption Ideas"),
+      h(Card, null,
+        captions.map(function(c, i) {
+          return h("div", { key: i, style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < captions.length - 1 ? "1px solid #1e293b" : "none" } },
+            h("span", { style: { fontSize: 14, color: "#e2e8f0", flex: 1, marginRight: 8 } }, c),
+            h(CopyBtn, { text: c })
+          );
+        })
+      ),
+
+      h("div", { style: { display: "flex", gap: 10, marginTop: 32 } },
+        h("button", {
+          onClick: function() { setView("home"); setTab("create"); },
+          style: {
+            flex: 1, padding: "16px", borderRadius: 14, border: "2px solid #334155", background: "transparent",
+            color: "#94a3b8", fontSize: 15, fontWeight: 700, cursor: "pointer",
+          }
+        }, "← Home"),
+        h("button", {
+          onClick: resetAll,
+          style: {
+            flex: 2, padding: "16px", borderRadius: 14, border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer",
+            background: "linear-gradient(135deg, #8b5cf6, #6366f1)", color: "#fff",
+            boxShadow: "0 4px 20px #8b5cf640",
+          }
+        }, "+ Make Another")
+      )
+    );
+  };
+
+  // ─── WIZARD WRAPPER ─────────────────────────────────────
+
+  var WizardScreen = function() {
+    var screens = [ContextScreen, SelectScreen, BuildScreen, CreativeScreen, PromptScreen, VisualScreen, ValidateScreen, OutputScreen];
+    var CurrentScreen = screens[step];
+    return h("div", { style: { maxWidth: 540, margin: "0 auto", padding: "16px 20px 100px" } },
+      h("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 } },
+        h("button", {
+          onClick: function() { if (step === 0) setView("home"); else setStep(step - 1); },
+          style: { background: "none", border: "none", color: "#94a3b8", fontSize: 15, cursor: "pointer", padding: "6px 0", fontWeight: 600 }
+        }, "← " + (step === 0 ? "Home" : "Back")),
+        h("span", { style: { fontSize: 13, color: "#64748b", fontWeight: 500 } }, (STEP_CONFIG[step] && STEP_CONFIG[step].icon) + " " + (STEP_CONFIG[step] && STEP_CONFIG[step].shortLabel))
+      ),
+      h(ProgressBar, { step: step, total: STEP_CONFIG.length }),
+      h(CurrentScreen)
+    );
+  };
+
+  // ─── HOME SCREEN ────────────────────────────────────────
+
+  var HomeScreen = function() {
+    return h("div", { style: { padding: 24, maxWidth: 480, margin: "0 auto" } },
+      h("div", { style: { textAlign: "center", padding: "48px 0 36px" } },
+        h("div", { style: { fontSize: 52, marginBottom: 16 } }, "⚡"),
+        h("h1", { style: { fontSize: 28, fontWeight: 900, color: "#e2e8f0", margin: 0, lineHeight: 1.2 } },
+          "Viral Content", h("br"), "Operating System"
+        ),
+        h("p", { style: { color: "#64748b", fontSize: 15, marginTop: 10 } }, "Make scroll-stopping content in 8 easy steps")
+      ),
+
+      h("button", {
+        onClick: resetAll,
+        style: {
+          width: "100%", padding: "20px", borderRadius: 18, border: "none", fontSize: 18, fontWeight: 800,
+          cursor: "pointer", background: "linear-gradient(135deg, #8b5cf6, #6366f1)", color: "#fff",
+          boxShadow: "0 4px 24px #8b5cf640", transition: "all 0.2s",
+        }
+      }, "+ New Content"),
+
+      h("div", { style: { marginTop: 32, display: "flex", flexDirection: "column", gap: 10 } },
+        [
+          { icon: "\u{1f4c1}", label: "Saved Projects", count: projects.length, action: function() { setTab("projects"); setView("projects"); } },
+          { icon: "\u{1f3c6}", label: "Winning Formats", count: WINNING_FORMATS.length, action: function() { setTab("formats"); setView("formats"); } },
+          { icon: "\u{1f4ca}", label: "Analytics", count: 0, action: function() {} },
+          { icon: "\u{1f4ac}", label: "Prompt Library", count: 0, action: function() {} },
+        ].map(function(item, i) {
+          return h("button", {
+            key: i,
+            onClick: item.action,
+            style: {
+              display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
+              padding: "16px 18px", background: "#0f172a", border: "1.5px solid #1e293b", borderRadius: 14,
+              color: "#e2e8f0", fontSize: 15, cursor: "pointer", textAlign: "left", fontWeight: 500,
+            }
+          },
+            h("span", { style: { display: "flex", alignItems: "center", gap: 12 } },
+              h("span", { style: { fontSize: 22 } }, item.icon), " " + item.label
+            ),
+            h("span", { style: { background: "#1e293b", padding: "4px 12px", borderRadius: 99, fontSize: 13, color: "#94a3b8", fontWeight: 600 } }, item.count)
+          );
+        })
+      )
+    );
+  };
+
+  // ─── FORMATS TAB ────────────────────────────────────────
+
+  var FormatsTab = function() {
+    return h("div", { style: { maxWidth: 540, margin: "0 auto", padding: "16px 20px 100px" } },
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f3c6} Winning Formats"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 24px" } }, "These are content styles that get tons of views. Use them as your starting point!"),
+      WINNING_FORMATS.map(function(f, i) {
+        return h(Card, { key: i },
+          h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 } },
+            h("h3", { style: { margin: 0, fontSize: 17, fontWeight: 700, color: "#e2e8f0" } }, f.name),
+            h("span", { style: { background: "#1e293b", padding: "4px 12px", borderRadius: 99, fontSize: 12, color: "#94a3b8", fontWeight: 600, flexShrink: 0 } }, f.platform)
+          ),
+          h("p", { style: { fontSize: 14, color: "#22c55e", margin: "0 0 10px", fontWeight: 600 } }, "\u{1f4c8} " + f.avgPerf),
+          h("div", { style: { fontSize: 13, color: "#94a3b8", lineHeight: 1.7 } },
+            h("div", null, h("strong", { style: { color: "#e2e8f0" } }, "Hook:"), " " + f.hook),
+            h("div", null, h("strong", { style: { color: "#e2e8f0" } }, "Story flow:"), " " + f.story),
+            h("div", null, h("strong", { style: { color: "#e2e8f0" } }, "Best for:"), " " + f.bestUse)
+          )
+        );
+      })
+    );
+  };
+
+  // ─── PROJECTS TAB ───────────────────────────────────────
+
+  var ProjectsTab = function() {
+    return h("div", { style: { maxWidth: 540, margin: "0 auto", padding: "16px 20px 100px" } },
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f4c1} Saved Projects"),
+      h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 24px" } }, projects.length + " project" + (projects.length !== 1 ? "s" : "") + " saved"),
+      projects.length === 0 ?
+        h(Card, { style: { textAlign: "center", padding: 48 } },
+          h("span", { style: { fontSize: 40, display: "block", marginBottom: 12 } }, "\u{1f4c2}"),
+          h("p", { style: { color: "#64748b", fontSize: 15, marginBottom: 16 } }, "No saved projects yet."),
+          h("button", {
+            onClick: resetAll,
+            style: {
+              padding: "14px 28px", borderRadius: 14, border: "none", fontSize: 15, fontWeight: 700,
+              cursor: "pointer", background: "linear-gradient(135deg, #8b5cf6, #6366f1)", color: "#fff",
+            }
+          }, "+ Make Your First One")
+        )
+      : projects.map(function(p, i) {
+          return h(Card, { key: i },
+            h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
+              h("div", null,
+                h("h3", { style: { margin: 0, fontSize: 16, fontWeight: 700, color: "#e2e8f0" } }, p.name),
+                h("p", { style: { margin: "4px 0 0", fontSize: 13, color: "#64748b" } }, p.platform + " · " + p.date)
+              ),
+              h("div", {
+                style: {
+                  padding: "6px 14px", borderRadius: 99, fontSize: 15, fontWeight: 800,
+                  background: p.score >= 76 ? "#14532d" : p.score >= 51 ? "#1e3a5f" : "#7f1d1d",
+                  color: p.score >= 76 ? "#86efac" : p.score >= 51 ? "#93c5fd" : "#fca5a5",
+                }
+              }, p.score + "%")
+            )
+          );
+        })
+    );
+  };
+
+  // ─── BOTTOM NAV ─────────────────────────────────────────
+
+  var BottomNav = function() {
+    var items = [
+      { id: "create", icon: "⚡", label: "Create" },
+      { id: "formats", icon: "\u{1f3c6}", label: "Formats" },
+      { id: "projects", icon: "\u{1f4c1}", label: "Projects" },
+      { id: "analytics", icon: "\u{1f4ca}", label: "Analytics" },
+      { id: "settings", icon: "⚙️", label: "Settings" },
+    ];
+    return h("div", {
+      style: {
+        position: "fixed", bottom: 0, left: 0, right: 0, background: "#0f172aee",
+        borderTop: "1px solid #1e293b", display: "flex", justifyContent: "space-around",
+        padding: "10px 0 14px", zIndex: 100, backdropFilter: "blur(10px)",
+      }
+    },
+      items.map(function(item) {
+        var active = tab === item.id;
+        return h("button", {
+          key: item.id,
+          onClick: function() { setTab(item.id); setView(item.id === "create" ? "home" : item.id); },
+          style: {
+            background: "none", border: "none", display: "flex", flexDirection: "column",
+            alignItems: "center", gap: 3, cursor: "pointer", padding: "4px 12px",
+            color: active ? "#8b5cf6" : "#64748b", fontSize: 11, fontWeight: active ? 700 : 500,
+            transition: "all 0.2s",
+          }
+        },
+          h("span", { style: { fontSize: 20, transition: "transform 0.2s", transform: active ? "scale(1.15)" : "scale(1)" } }, item.icon),
+          item.label
+        );
+      })
+    );
+  };
+
+  // ─── RENDER ─────────────────────────────────────────────
+
+  var renderView = function() {
+    if (view === "wizard") return h(WizardScreen);
+    if (view === "formats" || tab === "formats") return h(FormatsTab);
+    if (view === "projects" || tab === "projects") return h(ProjectsTab);
+    return h(HomeScreen);
+  };
+
+  return h("div", { style: { minHeight: "100vh", background: "#020617", color: "#e2e8f0", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" } },
+    renderView(),
+    h(BottomNav)
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(React.StrictMode, null, h(App)));
+</script></body></html>

@@ -667,12 +667,23 @@ function App() {
       }),
 
       h("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:8}},
-        ["\u{1f504} Regenerate","\u{1f525} Make Edgier","\u{1f602} Add Humor","\u{2702}️ Make Shorter"].map(function(label){
-          return h("button",{key:label,onClick:function(){if(label.indexOf("Regenerate")!==-1){doGenerate();}},style:{padding:"10px 16px",borderRadius:99,border:"1px solid #334155",background:"transparent",color:"#94a3b8",fontSize:13,cursor:"pointer",fontWeight:500}},label);
+        ["\u{1f504} Regenerate","\u{1f525} Make Edgier","\u{1f602} Add Humor","\u{2702}\ufe0f Make Shorter"].map(function(label){
+          return h("button",{key:label,onClick:function(){
+            if(label.indexOf("Regenerate")!==-1){doGenerate();}
+            else if(aiResult && apiKey){
+              var modifier = label.indexOf("Edgier")!==-1 ? "Make the content edgier, bolder, and more provocative. Push boundaries. Add attitude and swagger." : label.indexOf("Humor")!==-1 ? "Add humor, wit, and personality. Make it funny and relatable. Use memes, sarcasm, or comedic timing." : "Make everything shorter and punchier. Cut the fluff. Every word must earn its place. Maximum impact, minimum words.";
+              setLoading(true);setAiError("");
+              var sel = {website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,hook:hookStyle,tone:tone,feature:feature,infoBank:infoBank[website]||""};
+              var prev = JSON.stringify(aiResult);
+              var sysP = "You are a content editor. Take the existing content and rewrite it with this modifier: " + modifier + " Return the SAME JSON structure. Return ONLY valid JSON.";
+              fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},body:JSON.stringify({model:"gpt-4o-mini",messages:[{role:"system",content:sysP},{role:"user",content:"Here is the current content to modify:\n"+prev}],temperature:0.9,max_tokens:3000})}).then(function(r){return r.json();}).then(function(data){
+                if(data.error){setAiError(data.error.message);setLoading(false);return;}
+                try{var c=data.choices[0].message.content;c=c.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim();setAiResult(JSON.parse(c));setLoading(false);}catch(e){setAiError("Failed to parse response.");setLoading(false);}
+              }).catch(function(e){setAiError("Network error.");setLoading(false);});
+            } else if(aiResult && !apiKey){setAiError("Add your OpenAI API key in Settings to use "+label.slice(2));}
+          },style:{padding:"10px 16px",borderRadius:99,border:"1px solid #334155",background:"transparent",color:"#94a3b8",fontSize:13,cursor:"pointer",fontWeight:500}},label);
         })
-      ),
-
-      h(NextBtn,{onClick:function(){saveProject();setStep(5);},label:"Save & Get Content Pack",color:STEP_LABELS[5].color})
+      ),    h(NextBtn,{onClick:function(){saveProject();setStep(5);},label:"Save & Get Content Pack",color:STEP_LABELS[5].color})
     );
   };
 

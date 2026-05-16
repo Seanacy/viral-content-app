@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Viral Content OS</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>â¡</text></svg>" />
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#020617;-webkit-font-smoothing:antialiased}
@@ -23,21 +23,21 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#8b5cf6!import
 const { useState, useCallback } = React;
 const h = React.createElement;
 
-// ─── CONSTANTS ────────────────────────────────────────────
+// âââ CONSTANTS ââââââââââââââââââââââââââââââââââââââââââââ
 const PLATFORMS = [
   { id: "tiktok", label: "TikTok", icon: "\u{1f3b5}", color: "#ff0050" },
   { id: "ig-reel", label: "Instagram Reel", icon: "\u{1f4f8}", color: "#e1306c" },
   { id: "story", label: "Story", icon: "\u{1f4f1}", color: "#833ab4" },
-  { id: "static-ad", label: "Static Ad", icon: "\u{1f5bc}️", color: "#f59e0b" },
-  { id: "yt-short", label: "YouTube Short", icon: "▶️", color: "#ff0000" },
+  { id: "static-ad", label: "Static Ad", icon: "\u{1f5bc}ï¸", color: "#f59e0b" },
+  { id: "yt-short", label: "YouTube Short", icon: "â¶ï¸", color: "#ff0000" },
 ];
 
 const FEELINGS = [
   { label: "Curious", icon: "\u{1f914}" },
   { label: "Powerful", icon: "\u{1f4aa}" },
   { label: "Smart", icon: "\u{1f9e0}" },
-  { label: "Early", icon: "⏰" },
-  { label: "Attractive", icon: "✨" },
+  { label: "Early", icon: "â°" },
+  { label: "Attractive", icon: "â¨" },
   { label: "Relieved", icon: "\u{1f60c}" },
   { label: "Inspired", icon: "\u{1f525}" },
 ];
@@ -48,11 +48,11 @@ const GOALS = [
   { label: "Saves", icon: "\u{1f516}", desc: "Make people save it for later" },
   { label: "DMs", icon: "\u{1f4ac}", desc: "Get people to message you" },
   { label: "Clicks", icon: "\u{1f446}", desc: "Get people to tap your link" },
-  { label: "Follows", icon: "➕", desc: "Get new followers" },
+  { label: "Follows", icon: "â", desc: "Get new followers" },
 ];
 
 const HOOK_TYPES = [
-  { label: "Curiosity", icon: "❓", desc: "Makes them wonder what happens next", example: "\"Nobody's talking about this...\"" },
+  { label: "Curiosity", icon: "â", desc: "Makes them wonder what happens next", example: "\"Nobody's talking about this...\"" },
   { label: "Disbelief", icon: "\u{1f631}", desc: "So surprising they HAVE to keep watching", example: "\"I can't believe this actually works\"" },
   { label: "Identity", icon: "\u{1fa9e}", desc: "They see themselves in your content", example: "\"POV: You just found out...\"" },
   { label: "Authority", icon: "\u{1f451}", desc: "You know something they don't", example: "\"As a doctor, here's what I'd never do...\"" },
@@ -64,15 +64,15 @@ const NATIVE_STYLES = [
   { label: "Documentary", icon: "\u{1f3a5}", desc: "Tells a real story" },
   { label: "Casual iPhone", icon: "\u{1f4f1}", desc: "Shot on phone, nothing fancy" },
   { label: "Cinematic", icon: "\u{1f3ac}", desc: "Beautiful, movie-like quality" },
-  { label: "Interview", icon: "\u{1f399}️", desc: "Someone talking to camera" },
+  { label: "Interview", icon: "\u{1f399}ï¸", desc: "Someone talking to camera" },
 ];
 
 const WINNING_FORMATS = [
-  { name: "POV Discovery", platform: "TikTok", avgPerf: "2.4M avg views", hook: "POV: You just found out...", story: "Discovery → Disbelief → Proof → CTA", bestUse: "Product reveals, before/after" },
-  { name: "Comparison Hook", platform: "Instagram Reel", avgPerf: "890K avg views", hook: "X vs Y (nobody talks about this)", story: "Setup → Side-by-side → Winner → Why", bestUse: "Product differentiation, myth busting" },
-  { name: "Shock Reveal", platform: "TikTok", avgPerf: "3.1M avg views", hook: "I can't believe this actually works", story: "Tease → Build tension → Reveal → Reaction", bestUse: "Transformations, results, hacks" },
-  { name: "Walk-up Challenge", platform: "YouTube Short", avgPerf: "1.2M avg views", hook: "I asked strangers to...", story: "Setup → Approach → Reaction → Twist", bestUse: "Brand awareness, engagement bait" },
-  { name: "Relatable Meme Build", platform: "Instagram Reel", avgPerf: "650K avg views", hook: "When you [relatable moment]...", story: "Setup → Escalation → Punchline → Tag", bestUse: "Community building, shareability" },
+  { name: "POV Discovery", platform: "TikTok", avgPerf: "2.4M avg views", hook: "POV: You just found out...", story: "Discovery â Disbelief â Proof â CTA", bestUse: "Product reveals, before/after" },
+  { name: "Comparison Hook", platform: "Instagram Reel", avgPerf: "890K avg views", hook: "X vs Y (nobody talks about this)", story: "Setup â Side-by-side â Winner â Why", bestUse: "Product differentiation, myth busting" },
+  { name: "Shock Reveal", platform: "TikTok", avgPerf: "3.1M avg views", hook: "I can't believe this actually works", story: "Tease â Build tension â Reveal â Reaction", bestUse: "Transformations, results, hacks" },
+  { name: "Walk-up Challenge", platform: "YouTube Short", avgPerf: "1.2M avg views", hook: "I asked strangers to...", story: "Setup â Approach â Reaction â Twist", bestUse: "Brand awareness, engagement bait" },
+  { name: "Relatable Meme Build", platform: "Instagram Reel", avgPerf: "650K avg views", hook: "When you [relatable moment]...", story: "Setup â Escalation â Punchline â Tag", bestUse: "Community building, shareability" },
 ];
 
 const STEP_CONFIG = [
@@ -81,12 +81,12 @@ const STEP_CONFIG = [
   { label: "Build Your Hook", icon: "\u{1fa9d}", color: "#3b82f6", shortLabel: "Hook" },
   { label: "Set the Scene", icon: "\u{1f3a8}", color: "#0ea5e9", shortLabel: "Scene" },
   { label: "Your AI Recipe", icon: "\u{1f916}", color: "#14b8a6", shortLabel: "Recipe" },
-  { label: "Picture Perfect", icon: "\u{1f441}️", color: "#22c55e", shortLabel: "Visual" },
-  { label: "Final Check", icon: "✅", color: "#eab308", shortLabel: "Check" },
+  { label: "Picture Perfect", icon: "\u{1f441}ï¸", color: "#22c55e", shortLabel: "Visual" },
+  { label: "Final Check", icon: "â", color: "#eab308", shortLabel: "Check" },
   { label: "Your Content Pack", icon: "\u{1f381}", color: "#f97316", shortLabel: "Done!" },
 ];
 
-// ─── REUSABLE COMPONENTS ──────────────────────────────────
+// âââ REUSABLE COMPONENTS ââââââââââââââââââââââââââââââââââ
 
 function ScoreMeter({ score, label }) {
   var getColor = function(s) {
@@ -129,7 +129,7 @@ function CheckItem({ checked, onChange, label, hint }) {
         background: checked ? "linear-gradient(135deg, #8b5cf6, #6366f1)" : "transparent",
         transition: "all 0.2s", fontSize: 16,
       }
-    }, checked && "✓"),
+    }, checked && "â"),
     h("div", null,
       h("div", { style: { fontWeight: 500 } }, label),
       hint && h("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } }, hint)
@@ -153,7 +153,7 @@ function BigChoice({ selected, onSelect, label, icon, desc, color }) {
       h("div", { style: { fontSize: 15, fontWeight: 600, color: active ? "#e2e8f0" : "#94a3b8" } }, label),
       desc && h("div", { style: { fontSize: 12, color: "#64748b", marginTop: 2 } }, desc)
     ),
-    active && h("span", { style: { marginLeft: "auto", fontSize: 18, color: color || "#8b5cf6" } }, "✓")
+    active && h("span", { style: { marginLeft: "auto", fontSize: 18, color: color || "#8b5cf6" } }, "â")
   );
 }
 
@@ -168,7 +168,7 @@ function TagPill({ label, icon, active, onClick }) {
     }
   },
     icon && h("span", null, icon),
-    (active ? "✓ " : "") + label
+    (active ? "â " : "") + label
   );
 }
 
@@ -214,7 +214,7 @@ function NextButton({ onClick, label, disabled, color }) {
       color: "#fff", transition: "all 0.2s", marginTop: 32,
       boxShadow: disabled ? "none" : "0 4px 20px " + (color || "#8b5cf6") + "40",
     }
-  }, label + " →");
+  }, label + " â");
 }
 
 function Card({ children, style, glow }) {
@@ -231,10 +231,10 @@ function CopyBtn({ text }) {
   return h("button", {
     onClick: function() { navigator.clipboard.writeText(text); setCopied(true); setTimeout(function() { setCopied(false); }, 1500); },
     style: { background: copied ? "#14532d" : "#1e293b", border: "1px solid #334155", borderRadius: 10, padding: "6px 14px", color: copied ? "#86efac" : "#94a3b8", fontSize: 13, cursor: "pointer", fontWeight: 600, transition: "all 0.2s" }
-  }, copied ? "✓ Copied!" : "\u{1f4cb} Copy");
+  }, copied ? "â Copied!" : "\u{1f4cb} Copy");
 }
 
-// ─── PROGRESS BAR ─────────────────────────────────────────
+// âââ PROGRESS BAR âââââââââââââââââââââââââââââââââââââââââ
 
 function ProgressBar({ step, total }) {
   return h("div", { style: { marginBottom: 24 } },
@@ -259,7 +259,7 @@ function ProgressBar({ step, total }) {
   );
 }
 
-// ─── MAIN APP ─────────────────────────────────────────────
+// âââ MAIN APP âââââââââââââââââââââââââââââââââââââââââââââ
 
 function App() {
   var _view = useState("home"), view = _view[0], setView = _view[1];
@@ -267,7 +267,7 @@ function App() {
   var _step = useState(0), step = _step[0], setStep = _step[1];
   var _projects = useState([]), projects = _projects[0], setProjects = _projects[1];
 
-  // ── Form state ──
+  // ââ Form state ââ
   var _ctx = useState({ brand: "", offer: "", platform: "", audience: "", want: "", problem: "", feelings: [], goal: "" }), ctx = _ctx[0], setCtx = _ctx[1];
   var _sel = useState({ idea: "", checks: { proven: false, audience: false, native: false, productFit: false } }), sel = _sel[0], setSel = _sel[1];
   var _build = useState({ hookType: "", hookDraft: "", hookChecks: { under2: false, noProduct: false, tension: false, relevance: false }, identity: "", authority: "", tensionSrc: "", storyHook: "", storyProblem: "", storyEscalation: "", storyPayoff: "" }), build = _build[0], setBuild = _build[1];
@@ -318,14 +318,14 @@ function App() {
     setProjects(function(prev) { return [p].concat(prev); });
   };
 
-  // ─── SCREEN 0: TELL ME ABOUT IT ────────────────────────
+  // âââ SCREEN 0: TELL ME ABOUT IT ââââââââââââââââââââââââ
 
   var ContextScreen = function() {
     return h("div", null,
       h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f4dd} Tell Me About It"),
       h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "First, let's get the basics down. What are you making content for?"),
 
-      h(SectionHeader, { icon: "\u{1f3f7}️", sub: "What's the name of your brand or project?" }, "Your Brand"),
+      h(SectionHeader, { icon: "\u{1f3f7}ï¸", sub: "What's the name of your brand or project?" }, "Your Brand"),
       h(TextInput, { label: "Brand or Project Name", value: ctx.brand, onChange: function(v) { setCtx(Object.assign({}, ctx, { brand: v })); }, placeholder: "e.g. GlowSkin, My Etsy Shop, My Music" }),
       h(TextInput, { label: "What are you selling or promoting?", value: ctx.offer, onChange: function(v) { setCtx(Object.assign({}, ctx, { offer: v })); }, placeholder: "e.g. A 30-day acne treatment kit", hint: "This is the thing you want people to know about" }),
 
@@ -362,16 +362,16 @@ function App() {
     );
   };
 
-  // ─── SCREEN 1: IS THIS A GOOD IDEA? ────────────────────
+  // âââ SCREEN 1: IS THIS A GOOD IDEA? ââââââââââââââââââââ
 
   var SelectScreen = function() {
     return h("div", null,
       h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f914} Is This a Good Idea?"),
       h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Before you spend time making it, let's make sure this idea is worth building."),
 
-      h(TextInput, { label: "Describe your content idea", value: sel.idea, onChange: function(v) { setSel(Object.assign({}, sel, { idea: v })); }, placeholder: "Tell me what your video/post is about in a few sentences...", hint: "Don't worry about making it perfect — just get the idea out", large: true }),
+      h(TextInput, { label: "Describe your content idea", value: sel.idea, onChange: function(v) { setSel(Object.assign({}, sel, { idea: v })); }, placeholder: "Tell me what your video/post is about in a few sentences...", hint: "Don't worry about making it perfect â just get the idea out", large: true }),
 
-      h(SectionHeader, { icon: "✅", sub: "Check each box if it's true. You need at least 3 out of 4 to move on." }, "Idea Checklist"),
+      h(SectionHeader, { icon: "â", sub: "Check each box if it's true. You need at least 3 out of 4 to move on." }, "Idea Checklist"),
       h(Card, null,
         h(CheckItem, { label: "This type of content already works", hint: "Have you seen similar videos get lots of views?", checked: sel.checks.proven, onChange: function(v) { setSel(Object.assign({}, sel, { checks: Object.assign({}, sel.checks, { proven: v }) })); } }),
         h(CheckItem, { label: "My audience already watches this stuff", hint: "Would the people you're targeting actually stop for this?", checked: sel.checks.audience, onChange: function(v) { setSel(Object.assign({}, sel, { checks: Object.assign({}, sel.checks, { audience: v }) })); } }),
@@ -384,20 +384,20 @@ function App() {
       selectionScore > 0 && selectionScore <= 50 &&
         h(Card, { style: { marginTop: 16 }, glow: "#ef4444" },
           h("p", { style: { color: "#fca5a5", fontSize: 14, margin: 0, fontWeight: 500 } },
-            "⚠️ This idea needs work. Try picking a format that already gets lots of views, or make sure your audience would actually stop scrolling for this."
+            "â ï¸ This idea needs work. Try picking a format that already gets lots of views, or make sure your audience would actually stop scrolling for this."
           )
         ),
 
       h(NextButton, {
         onClick: function() { setStep(2); },
-        label: selectionScore < 50 ? "Score too low — fix your idea first" : "Next: Build Your Hook",
+        label: selectionScore < 50 ? "Score too low â fix your idea first" : "Next: Build Your Hook",
         disabled: selectionScore < 50,
         color: STEP_CONFIG[2].color,
       })
     );
   };
 
-  // ─── SCREEN 2: BUILD YOUR HOOK ──────────────────────────
+  // âââ SCREEN 2: BUILD YOUR HOOK ââââââââââââââââââââââââââ
 
   var BuildScreen = function() {
     return h("div", null,
@@ -407,16 +407,16 @@ function App() {
       h(SectionHeader, { icon: "\u{1f3a3}", sub: "Pick ONE way to grab attention in the first 2 seconds" }, "Hook Type"),
       h("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
         HOOK_TYPES.map(function(ht) {
-          return h(BigChoice, { key: ht.label, selected: build.hookType, onSelect: function(v) { setBuild(Object.assign({}, build, { hookType: v })); }, label: ht.label, icon: ht.icon, desc: ht.desc + " — " + ht.example, color: "#3b82f6" });
+          return h(BigChoice, { key: ht.label, selected: build.hookType, onSelect: function(v) { setBuild(Object.assign({}, build, { hookType: v })); }, label: ht.label, icon: ht.icon, desc: ht.desc + " â " + ht.example, color: "#3b82f6" });
         })
       ),
 
-      h(SectionHeader, { icon: "✍️", sub: "Write your opening line — what do people see/hear first?" }, "Write Your Hook"),
+      h(SectionHeader, { icon: "âï¸", sub: "Write your opening line â what do people see/hear first?" }, "Write Your Hook"),
       h(TextInput, { label: "Your Hook Line", value: build.hookDraft, onChange: function(v) { setBuild(Object.assign({}, build, { hookDraft: v })); }, placeholder: "e.g. 'Nobody talks about this skincare hack...'", hint: "Keep it short! Under 2 seconds when said out loud." }),
 
-      h(SectionHeader, { icon: "✅", sub: "Check each rule your hook follows" }, "Hook Rules"),
+      h(SectionHeader, { icon: "â", sub: "Check each rule your hook follows" }, "Hook Rules"),
       h(Card, null,
-        h(CheckItem, { label: "Takes under 2 seconds to say", hint: "Say it out loud — is it quick?", checked: build.hookChecks.under2, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { under2: v }) })); } }),
+        h(CheckItem, { label: "Takes under 2 seconds to say", hint: "Say it out loud â is it quick?", checked: build.hookChecks.under2, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { under2: v }) })); } }),
         h(CheckItem, { label: "Doesn't mention the product yet", hint: "Save the product reveal for later", checked: build.hookChecks.noProduct, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { noProduct: v }) })); } }),
         h(CheckItem, { label: "Makes people curious", hint: "Do they NEED to know what happens next?", checked: build.hookChecks.tension, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { tension: v }) })); } }),
         h(CheckItem, { label: "Clearly about something they care about", hint: "Is the topic obviously relevant to your audience?", checked: build.hookChecks.relevance, onChange: function(v) { setBuild(Object.assign({}, build, { hookChecks: Object.assign({}, build.hookChecks, { relevance: v }) })); } })
@@ -428,17 +428,17 @@ function App() {
       h(TextInput, { label: "Why should they trust you?", value: build.authority, onChange: function(v) { setBuild(Object.assign({}, build, { authority: v })); }, placeholder: "e.g. 'As someone who struggled with acne for 10 years...'", hint: "What makes YOU the right person to talk about this?" }),
       h(TextInput, { label: "What makes them NEED to keep watching?", value: build.tensionSrc, onChange: function(v) { setBuild(Object.assign({}, build, { tensionSrc: v })); }, placeholder: "e.g. They don't know the answer yet", hint: "The open question that keeps them hooked" }),
 
-      h(SectionHeader, { icon: "\u{1f4d6}", sub: "Plan your story in 4 parts — like a mini movie" }, "Story Outline"),
+      h(SectionHeader, { icon: "\u{1f4d6}", sub: "Plan your story in 4 parts â like a mini movie" }, "Story Outline"),
       h(TextInput, { label: "1. Opening moment", value: build.storyHook, onChange: function(v) { setBuild(Object.assign({}, build, { storyHook: v })); }, placeholder: "What happens first?", hint: "The scene that grabs attention" }),
       h(TextInput, { label: "2. The problem", value: build.storyProblem, onChange: function(v) { setBuild(Object.assign({}, build, { storyProblem: v })); }, placeholder: "What's the struggle?", hint: "What goes wrong or what's the challenge?" }),
-      h(TextInput, { label: "3. It gets bigger", value: build.storyEscalation, onChange: function(v) { setBuild(Object.assign({}, build, { storyEscalation: v })); }, placeholder: "How does it get more intense?", hint: "Raise the stakes — make people lean in" }),
+      h(TextInput, { label: "3. It gets bigger", value: build.storyEscalation, onChange: function(v) { setBuild(Object.assign({}, build, { storyEscalation: v })); }, placeholder: "How does it get more intense?", hint: "Raise the stakes â make people lean in" }),
       h(TextInput, { label: "4. The payoff", value: build.storyPayoff, onChange: function(v) { setBuild(Object.assign({}, build, { storyPayoff: v })); }, placeholder: "The satisfying ending", hint: "The reveal, the win, the surprise" }),
 
       h(NextButton, { onClick: function() { setStep(3); }, label: "Next: Set the Scene", color: STEP_CONFIG[3].color })
     );
   };
 
-  // ─── SCREEN 3: SET THE SCENE ────────────────────────────
+  // âââ SCREEN 3: SET THE SCENE ââââââââââââââââââââââââââââ
 
   var CreativeScreen = function() {
     return h("div", null,
@@ -446,7 +446,7 @@ function App() {
       h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Now let's figure out what this actually looks like. Close your eyes and picture it."),
 
       h(SectionHeader, { icon: "\u{1f48e}", sub: "What's the REAL message behind this content?" }, "The Deeper Meaning"),
-      h(TextInput, { label: "What is this really about?", value: creative.reallyAbout, onChange: function(v) { setCreative(Object.assign({}, creative, { reallyAbout: v })); }, placeholder: "e.g. It's about feeling confident in your own skin", hint: "Not the surface level — the deeper truth" }),
+      h(TextInput, { label: "What is this really about?", value: creative.reallyAbout, onChange: function(v) { setCreative(Object.assign({}, creative, { reallyAbout: v })); }, placeholder: "e.g. It's about feeling confident in your own skin", hint: "Not the surface level â the deeper truth" }),
 
       h(Card, { glow: "#6366f1" },
         h("p", { style: { fontSize: 14, color: "#a5b4fc", margin: "0 0 10px", fontWeight: 600 } }, "\u{1f3af} Sum it up in one sentence:"),
@@ -471,7 +471,7 @@ function App() {
     );
   };
 
-  // ─── SCREEN 4: YOUR AI RECIPE ───────────────────────────
+  // âââ SCREEN 4: YOUR AI RECIPE âââââââââââââââââââââââââââ
 
   var PromptScreen = function() {
     return h("div", null,
@@ -480,7 +480,7 @@ function App() {
 
       h(Card, { glow: "#14b8a6" },
         h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } },
-          h("span", { style: { fontSize: 15, fontWeight: 700, color: "#e2e8f0" } }, "✨ Generated Prompt"),
+          h("span", { style: { fontSize: 15, fontWeight: 700, color: "#e2e8f0" } }, "â¨ Generated Prompt"),
           h(CopyBtn, { text: prompt.text })
         ),
         h("textarea", {
@@ -492,7 +492,7 @@ function App() {
         h("p", { style: { fontSize: 12, color: "#64748b", margin: "8px 0 0" } }, "You can edit this! Change anything you want before copying.")
       ),
 
-      h(SectionHeader, { icon: "✅", sub: "Check each quality your prompt has" }, "Prompt Quality Check"),
+      h(SectionHeader, { icon: "â", sub: "Check each quality your prompt has" }, "Prompt Quality Check"),
       h(Card, null,
         h(CheckItem, { label: "Fits the platform", hint: "Would this look natural on the app you chose?", checked: prompt.checks.native, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { native: v }) })); } }),
         h(CheckItem, { label: "Has a clear focus point", hint: "Is there ONE thing the eye is drawn to?", checked: prompt.checks.focal, onChange: function(v) { setPrompt(Object.assign({}, prompt, { checks: Object.assign({}, prompt.checks, { focal: v }) })); } }),
@@ -507,17 +507,17 @@ function App() {
     );
   };
 
-  // ─── SCREEN 5: PICTURE PERFECT ──────────────────────────
+  // âââ SCREEN 5: PICTURE PERFECT ââââââââââââââââââââââââââ
 
   var VisualScreen = function() {
     return h("div", null,
-      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f441}️ Picture Perfect"),
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "\u{1f441}ï¸ Picture Perfect"),
       h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Check your visuals against what actually works. The more boxes you check, the better your content will perform."),
 
-      h(SectionHeader, { icon: "\u{1f5bc}️", sub: "What people see in the VERY first moment" }, "Opening Frame"),
+      h(SectionHeader, { icon: "\u{1f5bc}ï¸", sub: "What people see in the VERY first moment" }, "Opening Frame"),
       h(Card, null,
         h(CheckItem, { label: "Shows a face or action", hint: "People stop scrolling for faces and movement", checked: visual.opening.face, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { face: v }) })); } }),
-        h(CheckItem, { label: "Something is moving right away", hint: "Still images get skipped — movement wins", checked: visual.opening.movement, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { movement: v }) })); } }),
+        h(CheckItem, { label: "Something is moving right away", hint: "Still images get skipped â movement wins", checked: visual.opening.movement, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { movement: v }) })); } }),
         h(CheckItem, { label: "One clear thing to look at", hint: "Don't confuse the eye with too much", checked: visual.opening.focal, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { focal: v }) })); } }),
         h(CheckItem, { label: "Background isn't messy", hint: "Clean background = all attention on your content", checked: visual.opening.noClutter, onChange: function(v) { setVisual(Object.assign({}, visual, { opening: Object.assign({}, visual.opening, { noClutter: v }) })); } })
       ),
@@ -529,7 +529,7 @@ function App() {
         h(CheckItem, { label: "Made for phone screens", hint: "Vertical, close-up, easy to see on small screens", checked: visual.native.mobile, onChange: function(v) { setVisual(Object.assign({}, visual, { native: Object.assign({}, visual.native, { mobile: v }) })); } })
       ),
 
-      h(SectionHeader, { icon: "⚡", sub: "What makes someone stop scrolling?" }, "Surprise Factor"),
+      h(SectionHeader, { icon: "â¡", sub: "What makes someone stop scrolling?" }, "Surprise Factor"),
       h(Card, null,
         h(CheckItem, { label: "Something unexpected", hint: "A weird detail, surprising reveal, or unusual angle", checked: visual.interrupt.unexpected, onChange: function(v) { setVisual(Object.assign({}, visual, { interrupt: Object.assign({}, visual.interrupt, { unexpected: v }) })); } }),
         h(CheckItem, { label: "Strong contrast", hint: "Bright vs dark, big vs small, before vs after", checked: visual.interrupt.contrast, onChange: function(v) { setVisual(Object.assign({}, visual, { interrupt: Object.assign({}, visual.interrupt, { contrast: v }) })); } }),
@@ -540,13 +540,13 @@ function App() {
       h(Card, null,
         h(CheckItem, { label: "Big enough to read easily", hint: "Can you read it without squinting?", checked: visual.text.large, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { large: v }) })); } }),
         h(CheckItem, { label: "Can be read in 1-2 seconds", hint: "Short phrases, not paragraphs", checked: visual.text.fastRead, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { fastRead: v }) })); } }),
-        h(CheckItem, { label: "Not too much text", hint: "Less is more — let the video do the talking", checked: visual.text.minimal, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { minimal: v }) })); } })
+        h(CheckItem, { label: "Not too much text", hint: "Less is more â let the video do the talking", checked: visual.text.minimal, onChange: function(v) { setVisual(Object.assign({}, visual, { text: Object.assign({}, visual.text, { minimal: v }) })); } })
       ),
 
-      h(SectionHeader, { icon: "\u{1f6cd}️", sub: "How and when your product shows up" }, "Product Placement"),
+      h(SectionHeader, { icon: "\u{1f6cd}ï¸", sub: "How and when your product shows up" }, "Product Placement"),
       h(Card, null,
         h(CheckItem, { label: "Product doesn't show up too early", hint: "Tease first, reveal later", checked: visual.product.delayed, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { delayed: v }) })); } }),
-        h(CheckItem, { label: "Product appears naturally", hint: "Not shoved in your face — part of the story", checked: visual.product.natural, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { natural: v }) })); } }),
+        h(CheckItem, { label: "Product appears naturally", hint: "Not shoved in your face â part of the story", checked: visual.product.natural, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { natural: v }) })); } }),
         h(CheckItem, { label: "Doesn't feel like a commercial", hint: "Would you share this even if it wasn't selling something?", checked: visual.product.nonSalesy, onChange: function(v) { setVisual(Object.assign({}, visual, { product: Object.assign({}, visual.product, { nonSalesy: v }) })); } })
       ),
 
@@ -556,14 +556,14 @@ function App() {
     );
   };
 
-  // ─── SCREEN 6: FINAL CHECK ──────────────────────────────
+  // âââ SCREEN 6: FINAL CHECK ââââââââââââââââââââââââââââââ
 
   var ValidateScreen = function() {
     return h("div", null,
-      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "✅ Final Check"),
+      h("h2", { style: { fontSize: 24, fontWeight: 800, color: "#e2e8f0", margin: "0 0 6px" } }, "â Final Check"),
       h("p", { style: { color: "#64748b", fontSize: 14, margin: "0 0 28px" } }, "Last step before you're ready to go! This is your go/no-go checklist."),
 
-      h(SectionHeader, { icon: "⏱️", sub: "Will people watch the whole thing?" }, "Will They Keep Watching?"),
+      h(SectionHeader, { icon: "â±ï¸", sub: "Will people watch the whole thing?" }, "Will They Keep Watching?"),
       h(Card, null,
         h(CheckItem, { label: "No boring parts", hint: "Every single second has something interesting", checked: validate.retention.noDeadSpace, onChange: function(v) { setValidate(Object.assign({}, validate, { retention: Object.assign({}, validate.retention, { noDeadSpace: v }) })); } }),
         h(CheckItem, { label: "Something new every 1-3 seconds", hint: "New info, new visual, new twist", checked: validate.retention.newInfo, onChange: function(v) { setValidate(Object.assign({}, validate, { retention: Object.assign({}, validate.retention, { newInfo: v }) })); } }),
@@ -584,7 +584,7 @@ function App() {
         h(CheckItem, { label: "Curiosity comes before explanation", hint: "Make them wonder BEFORE you give answers", checked: validate.rules.curiosity, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { curiosity: v }) })); } }),
         h(CheckItem, { label: "Product comes later, not first", hint: "Hook them with the story, then show the product", checked: validate.rules.productLater, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { productLater: v }) })); } }),
         h(CheckItem, { label: "Every second earns its place", hint: "If you can cut it without losing anything, cut it", checked: validate.rules.everySecond, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { everySecond: v }) })); } }),
-        h(CheckItem, { label: "Based on something that already worked", hint: "Remix winners — don't reinvent the wheel", checked: validate.rules.repeatWinners, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { repeatWinners: v }) })); } })
+        h(CheckItem, { label: "Based on something that already worked", hint: "Remix winners â don't reinvent the wheel", checked: validate.rules.repeatWinners, onChange: function(v) { setValidate(Object.assign({}, validate, { rules: Object.assign({}, validate.rules, { repeatWinners: v }) })); } })
       ),
 
       h(ScoreMeter, { score: validateScore, label: "\u{1f3af} Viral Probability" }),
@@ -606,7 +606,7 @@ function App() {
         h("button", {
           onClick: function() { setStep(2); },
           style: { flex: 1, padding: "16px", borderRadius: 14, border: "2px solid #7f1d1d", background: "transparent", color: "#fca5a5", fontSize: 15, fontWeight: 700, cursor: "pointer" }
-        }, "← Go Back & Fix"),
+        }, "â Go Back & Fix"),
         h("button", {
           onClick: function() { saveProject(); setStep(7); },
           style: {
@@ -615,17 +615,17 @@ function App() {
             color: validateScore >= 50 ? "#fff" : "#64748b",
             boxShadow: validateScore >= 50 ? "0 4px 20px #22c55e40" : "none",
           }
-        }, "Approve & Finish ✓")
+        }, "Approve & Finish â")
       )
     );
   };
 
-  // ─── SCREEN 7: YOUR CONTENT PACK ────────────────────────
+  // âââ SCREEN 7: YOUR CONTENT PACK ââââââââââââââââââââââââ
 
   var OutputScreen = function() {
-    var brief = "CREATIVE BRIEF\n" + "═".repeat(35) + "\n\nBrand: " + ctx.brand + "\nOffer: " + ctx.offer + "\nPlatform: " + ctx.platform + "\nAudience: " + ctx.audience + "\nGoal: " + ctx.goal + "\n\nHook: " + build.storyHook + "\nHook Type: " + build.hookType + "\n\nStory:\n1. Opening: " + build.storyHook + "\n2. Problem: " + build.storyProblem + "\n3. Escalation: " + build.storyEscalation + "\n4. Payoff: " + build.storyPayoff + "\n\nStyle: " + creative.nativeStyle + "\nSetting: " + creative.setting + "\nSubject: " + creative.subject + "\nMood: " + creative.mood + "\n\nCore Message: " + creative.reallyAbout + "\n\nViral Score: " + validateScore + "/100";
+    var brief = "CREATIVE BRIEF\n" + "â".repeat(35) + "\n\nBrand: " + ctx.brand + "\nOffer: " + ctx.offer + "\nPlatform: " + ctx.platform + "\nAudience: " + ctx.audience + "\nGoal: " + ctx.goal + "\n\nHook: " + build.storyHook + "\nHook Type: " + build.hookType + "\n\nStory:\n1. Opening: " + build.storyHook + "\n2. Problem: " + build.storyProblem + "\n3. Escalation: " + build.storyEscalation + "\n4. Payoff: " + build.storyPayoff + "\n\nStyle: " + creative.nativeStyle + "\nSetting: " + creative.setting + "\nSubject: " + creative.subject + "\nMood: " + creative.mood + "\n\nCore Message: " + creative.reallyAbout + "\n\nViral Score: " + validateScore + "/100";
 
-    var shotList = "SHOT LIST\n" + "═".repeat(35) + "\n\n\u{1f3ac} SHOT 1 — OPENING (0-2s)\n" + build.storyHook + "\nStyle: " + creative.nativeStyle + "\nSetting: " + creative.setting + "\n\n\u{1f3ac} SHOT 2 — THE PROBLEM (2-5s)\n" + build.storyProblem + "\n\n\u{1f3ac} SHOT 3 — IT GETS BIGGER (5-10s)\n" + build.storyEscalation + "\n\n\u{1f3ac} SHOT 4 — THE PAYOFF (10-15s)\n" + build.storyPayoff + "\nProduct: " + ctx.offer;
+    var shotList = "SHOT LIST\n" + "â".repeat(35) + "\n\n\u{1f3ac} SHOT 1 â OPENING (0-2s)\n" + build.storyHook + "\nStyle: " + creative.nativeStyle + "\nSetting: " + creative.setting + "\n\n\u{1f3ac} SHOT 2 â THE PROBLEM (2-5s)\n" + build.storyProblem + "\n\n\u{1f3ac} SHOT 3 â IT GETS BIGGER (5-10s)\n" + build.storyEscalation + "\n\n\u{1f3ac} SHOT 4 â THE PAYOFF (10-15s)\n" + build.storyPayoff + "\nProduct: " + ctx.offer;
 
     var hooks = [
       build.hookDraft,
@@ -647,8 +647,8 @@ function App() {
       h(Card, { glow: "#22c55e" },
         h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
           h("div", null,
-            h("span", { style: { fontSize: 15, fontWeight: 700, color: "#86efac" } }, "✓ Ready to Go!"),
-            h("p", { style: { fontSize: 12, color: "#64748b", margin: "4px 0 0" } }, ctx.brand + " — " + ctx.platform)
+            h("span", { style: { fontSize: 15, fontWeight: 700, color: "#86efac" } }, "â Ready to Go!"),
+            h("p", { style: { fontSize: 12, color: "#64748b", margin: "4px 0 0" } }, ctx.brand + " â " + ctx.platform)
           ),
           h("span", { style: { fontSize: 28, fontWeight: 800, color: "#22c55e" } }, validateScore + "/100")
         )
@@ -701,7 +701,7 @@ function App() {
             flex: 1, padding: "16px", borderRadius: 14, border: "2px solid #334155", background: "transparent",
             color: "#94a3b8", fontSize: 15, fontWeight: 700, cursor: "pointer",
           }
-        }, "← Home"),
+        }, "â Home"),
         h("button", {
           onClick: resetAll,
           style: {
@@ -714,7 +714,7 @@ function App() {
     );
   };
 
-  // ─── WIZARD WRAPPER ─────────────────────────────────────
+  // âââ WIZARD WRAPPER âââââââââââââââââââââââââââââââââââââ
 
   var WizardScreen = function() {
     var screens = [ContextScreen, SelectScreen, BuildScreen, CreativeScreen, PromptScreen, VisualScreen, ValidateScreen, OutputScreen];
@@ -724,20 +724,20 @@ function App() {
         h("button", {
           onClick: function() { if (step === 0) setView("home"); else setStep(step - 1); },
           style: { background: "none", border: "none", color: "#94a3b8", fontSize: 15, cursor: "pointer", padding: "6px 0", fontWeight: 600 }
-        }, "← " + (step === 0 ? "Home" : "Back")),
+        }, "â " + (step === 0 ? "Home" : "Back")),
         h("span", { style: { fontSize: 13, color: "#64748b", fontWeight: 500 } }, (STEP_CONFIG[step] && STEP_CONFIG[step].icon) + " " + (STEP_CONFIG[step] && STEP_CONFIG[step].shortLabel))
       ),
       h(ProgressBar, { step: step, total: STEP_CONFIG.length }),
-      h(CurrentScreen)
+      CurrentScreen()
     );
   };
 
-  // ─── HOME SCREEN ────────────────────────────────────────
+  // âââ HOME SCREEN ââââââââââââââââââââââââââââââââââââââââ
 
   var HomeScreen = function() {
     return h("div", { style: { padding: 24, maxWidth: 480, margin: "0 auto" } },
       h("div", { style: { textAlign: "center", padding: "48px 0 36px" } },
-        h("div", { style: { fontSize: 52, marginBottom: 16 } }, "⚡"),
+        h("div", { style: { fontSize: 52, marginBottom: 16 } }, "â¡"),
         h("h1", { style: { fontSize: 28, fontWeight: 900, color: "#e2e8f0", margin: 0, lineHeight: 1.2 } },
           "Viral Content", h("br"), "Operating System"
         ),
@@ -779,7 +779,7 @@ function App() {
     );
   };
 
-  // ─── FORMATS TAB ────────────────────────────────────────
+  // âââ FORMATS TAB ââââââââââââââââââââââââââââââââââââââââ
 
   var FormatsTab = function() {
     return h("div", { style: { maxWidth: 540, margin: "0 auto", padding: "16px 20px 100px" } },
@@ -802,7 +802,7 @@ function App() {
     );
   };
 
-  // ─── PROJECTS TAB ───────────────────────────────────────
+  // âââ PROJECTS TAB âââââââââââââââââââââââââââââââââââââââ
 
   var ProjectsTab = function() {
     return h("div", { style: { maxWidth: 540, margin: "0 auto", padding: "16px 20px 100px" } },
@@ -825,7 +825,7 @@ function App() {
             h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
               h("div", null,
                 h("h3", { style: { margin: 0, fontSize: 16, fontWeight: 700, color: "#e2e8f0" } }, p.name),
-                h("p", { style: { margin: "4px 0 0", fontSize: 13, color: "#64748b" } }, p.platform + " · " + p.date)
+                h("p", { style: { margin: "4px 0 0", fontSize: 13, color: "#64748b" } }, p.platform + " Â· " + p.date)
               ),
               h("div", {
                 style: {
@@ -840,15 +840,15 @@ function App() {
     );
   };
 
-  // ─── BOTTOM NAV ─────────────────────────────────────────
+  // âââ BOTTOM NAV âââââââââââââââââââââââââââââââââââââââââ
 
   var BottomNav = function() {
     var items = [
-      { id: "create", icon: "⚡", label: "Create" },
+      { id: "create", icon: "â¡", label: "Create" },
       { id: "formats", icon: "\u{1f3c6}", label: "Formats" },
       { id: "projects", icon: "\u{1f4c1}", label: "Projects" },
       { id: "analytics", icon: "\u{1f4ca}", label: "Analytics" },
-      { id: "settings", icon: "⚙️", label: "Settings" },
+      { id: "settings", icon: "âï¸", label: "Settings" },
     ];
     return h("div", {
       style: {
@@ -876,18 +876,18 @@ function App() {
     );
   };
 
-  // ─── RENDER ─────────────────────────────────────────────
+  // âââ RENDER âââââââââââââââââââââââââââââââââââââââââââââ
 
   var renderView = function() {
-    if (view === "wizard") return h(WizardScreen);
-    if (view === "formats" || tab === "formats") return h(FormatsTab);
-    if (view === "projects" || tab === "projects") return h(ProjectsTab);
-    return h(HomeScreen);
+    if (view === "wizard") return WizardScreen();
+    if (view === "formats" || tab === "formats") return FormatsTab();
+    if (view === "projects" || tab === "projects") return ProjectsTab();
+    return HomeScreen();
   };
 
   return h("div", { style: { minHeight: "100vh", background: "#020617", color: "#e2e8f0", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" } },
     renderView(),
-    h(BottomNav)
+    BottomNav()
   );
 }
 

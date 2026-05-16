@@ -323,6 +323,7 @@ function generateWithAI(sel, apiKey, onResult, onError) {
     "\nHook Style: " + sel.hook +
     "\nTone: " + sel.tone +
     (sel.infoBank ? "\n\nAdditional Context:\n" + sel.infoBank : "") +
+    (sel.exampleBodies ? "\n\n--- EXAMPLE BODY TEXT (match this style, tone, and voice closely) ---\n" + sel.exampleBodies + "\n--- END EXAMPLES ---\nIMPORTANT: Use the example body texts above as STYLE REFERENCE. Match their voice, length, phrasing style, and energy when writing body text, captions, and ad copy. Do NOT copy them word-for-word \u2014 write NEW content that FEELS like it was written by the same person." : "") +
     "\n\nGenerate viral content that promotes " + offerName + " and drives viewers to " + sel.goal.toLowerCase() + ". Be specific to this brand and platform.";
 
   fetch("https://api.openai.com/v1/chat/completions", {
@@ -421,12 +422,14 @@ function App() {
   var _apiKey = useState(function(){try{return localStorage.getItem("vcos3_apikey")||"";}catch(e){return "";}}), apiKey = _apiKey[0], setApiKey = _apiKey[1];
   var _projects = useState(function(){try{return JSON.parse(localStorage.getItem("vcos3_projects")||"[]");}catch(e){return [];}}), projects = _projects[0], setProjects = _projects[1];
   var _infoBank = useState(function(){try{return JSON.parse(localStorage.getItem("vcos3_infobank")||"{}");}catch(e){return {};}}), infoBank = _infoBank[0], setInfoBank = _infoBank[1];
+  var _exampleBodies = useState(function(){try{return JSON.parse(localStorage.getItem("vcos3_examplebody")||"{}");}catch(e){return {};}}), exampleBodies = _exampleBodies[0], setExampleBodies = _exampleBodies[1];
   var _editingInfo = useState(""), editingInfo = _editingInfo[0], setEditingInfo = _editingInfo[1];
 
   // Persist
   useEffect(function(){try{localStorage.setItem("vcos3_apikey",apiKey);}catch(e){}},[apiKey]);
   useEffect(function(){try{localStorage.setItem("vcos3_projects",JSON.stringify(projects));}catch(e){}},[projects]);
   useEffect(function(){try{localStorage.setItem("vcos3_infobank",JSON.stringify(infoBank));}catch(e){}},[infoBank]);
+  useEffect(function(){try{localStorage.setItem("vcos3_examplebody",JSON.stringify(exampleBodies));}catch(e){}},[exampleBodies]);
 
   var resetWizard = function() {
     setStep(0); setWebsite(""); setContentType(""); setMediaType(""); setPlatform("");
@@ -436,7 +439,7 @@ function App() {
 
   var doGenerate = function() {
     setLoading(true); setAiError(""); setAiResult(null);
-    var sel = {website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,hook:hookStyle,tone:tone,feature:feature,infoBank:infoBank[website]||""};
+    var sel = {website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,hook:hookStyle,tone:tone,feature:feature,infoBank:infoBank[website]||"",exampleBodies:exampleBodies[website]||""};
     if(apiKey) {
       generateWithAI(sel, apiKey, function(result){setAiResult(result);setLoading(false);}, function(err){
         setAiResult(generateFallback(sel));setAiError("AI error: "+err+" — Showing templates instead.");setLoading(false);
@@ -616,6 +619,14 @@ function App() {
           return h(TapPill,{key:t.label,label:t.label,icon:t.icon,active:tone===t.label,onClick:function(){setTone(t.label);}});
         })
       ),
+
+      h(Section,{icon:"\u{270d}\ufe0f",title:"Example Body Text",sub:"Optional \u2014 paste your own examples so AI matches your voice"}),
+      h("textarea",{
+        value:exampleBodies[website]||"",
+        onChange:function(e){var nb=Object.assign({},exampleBodies);nb[website]=e.target.value;setExampleBodies(nb);},
+        placeholder:"Paste 2-3 body texts you\u2019ve written before so the AI matches your style and voice.",
+        style:{width:"100%",minHeight:100,padding:"14px 16px",background:"#0f172a",border:"2px solid #334155",borderRadius:14,color:"#e2e8f0",fontSize:14,outline:"none",fontFamily:"inherit",boxSizing:"border-box",resize:"vertical",lineHeight:1.5,marginBottom:16}
+      }),
 
       h(NextBtn,{onClick:function(){setStep(4);doGenerate();},label:apiKey?"Generate with AI \u{1f916}":"Generate Content",disabled:!format||!hookStyle||!tone,color:STEP_LABELS[4].color})
     );

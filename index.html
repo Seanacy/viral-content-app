@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Viral Content OS</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>â¡</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#020617;-webkit-font-smoothing:antialiased}
@@ -29,181 +29,116 @@ input:focus,textarea:focus{outline:none;border-color:#8b5cf6!important}
 var h = React.createElement;
 var useState = React.useState;
 var useEffect = React.useEffect;
-var useCallback = React.useCallback;
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// DATA â All the tap options
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
 
-var NICHES = [
-  { id:"beauty", label:"Beauty & Skincare", icon:"\u{1f484}", color:"#ec4899" },
-  { id:"fashion", label:"Fashion & Style", icon:"\u{1f457}", color:"#f472b6" },
-  { id:"food", label:"Food & Beverage", icon:"\u{1f354}", color:"#f59e0b" },
-  { id:"fitness", label:"Fitness & Health", icon:"\u{1f4aa}", color:"#22c55e" },
-  { id:"tech", label:"Tech & Apps", icon:"\u{1f4bb}", color:"#3b82f6" },
-  { id:"music", label:"Music & Art", icon:"\u{1f3b5}", color:"#a855f7" },
-  { id:"education", label:"Education & Courses", icon:"\u{1f4da}", color:"#0ea5e9" },
-  { id:"business", label:"Business & Services", icon:"\u{1f4bc}", color:"#6366f1" },
-  { id:"lifestyle", label:"Lifestyle & Wellness", icon:"\u{2728}", color:"#14b8a6" },
-  { id:"ecommerce", label:"E-Commerce & Products", icon:"\u{1f6d2}", color:"#f97316" },
+var WEBSITES = [
+  {id:"tentcity",label:"TentCity",url:"tentcity.app",icon:"\u{26fa}",color:"#22c55e",desc:"Housing & shelter solutions"},
+  {id:"bridgework",label:"BridgeWork",url:"bridgework.life",icon:"\u{1f309}",color:"#3b82f6",desc:"Community workforce platform"},
+  {id:"osaat",label:"OSAAT",url:"osaat.tech",icon:"\u{1f91d}",color:"#f97316",desc:"One Step At A Time"},
+  {id:"westackr",label:"WeStackr",url:"westackr.com",icon:"\u{1f4ca}",color:"#8b5cf6",desc:"Campaign & fundraising"},
+  {id:"modelbid",label:"ModelBid",url:"modelbid.tech",icon:"\u{1f4f8}",color:"#ec4899",desc:"Model marketplace & Inner Circle"},
+  {id:"stagepass",label:"StagePass",url:"stagepass.tech",icon:"\u{1f3a4}",color:"#a855f7",desc:"Event & performance platform"},
 ];
 
-var PRODUCTS = {
-  beauty:["Skincare line","Makeup brand","Hair care","Acne treatment","Anti-aging serum","Beauty tool/device"],
-  fashion:["Clothing brand","Accessories","Shoes","Jewelry","Streetwear","Thrift/vintage"],
-  food:["Restaurant","Recipe content","Meal prep","Supplements","Drinks/beverages","Snack brand"],
-  fitness:["Workout program","Supplements","Gym gear","Coaching","Fitness app","Meal plans"],
-  tech:["Mobile app","SaaS product","Gadget","Online tool","AI product","Software"],
-  music:["New single/album","Merch","Live shows","Music lessons","Beat production","Playlist"],
-  education:["Online course","Coaching","E-book","Tutoring","Membership","Workshop"],
-  business:["Agency","Consulting","Freelance","Local business","SaaS","Professional service"],
-  lifestyle:["Travel","Home decor","Wellness","Self-help","Relationships","Mindfulness"],
-  ecommerce:["Physical product","Digital product","Subscription box","Handmade goods","Dropship store","Print on demand"],
-};
-
-var PLATFORMS = [
-  { id:"tiktok", label:"TikTok", icon:"\u{1f3b5}", color:"#ff0050", type:"organic" },
-  { id:"ig-reel", label:"Instagram Reel", icon:"\u{1f4f8}", color:"#e1306c", type:"organic" },
-  { id:"ig-story", label:"IG Story", icon:"\u{1f4f1}", color:"#833ab4", type:"organic" },
-  { id:"yt-short", label:"YouTube Short", icon:"\u{25b6}ï¸", color:"#ff0000", type:"organic" },
-  { id:"twitter", label:"Twitter / X", icon:"\u{1f426}", color:"#1da1f2", type:"organic" },
-  { id:"facebook", label:"Facebook", icon:"\u{1f44d}", color:"#1877f2", type:"organic" },
-  { id:"fb-ads", label:"Facebook / IG Ads", icon:"\u{1f4b0}", color:"#1877f2", type:"paid" },
-  { id:"tiktok-ads", label:"TikTok Ads", icon:"\u{1f4b5}", color:"#ff0050", type:"paid" },
-  { id:"google-ads", label:"Google Ads", icon:"\u{1f50d}", color:"#4285f4", type:"paid" },
-  { id:"yt-ads", label:"YouTube Ads", icon:"\u{1f4fa}", color:"#ff0000", type:"paid" },
+var CONTENT_TYPES = [
+  {id:"organic",label:"Organic Content",icon:"\u{1f4f1}",color:"#22c55e",desc:"Free posts — TikTok, Reels, Stories, feed"},
+  {id:"paid",label:"Paid Ad",icon:"\u{1f4b0}",color:"#f59e0b",desc:"Paid advertising — FB Ads, TikTok Ads, Google Ads"},
 ];
 
-var AUDIENCES = {
-  beauty:[
-    {label:"Gen Z girls (16-24)",desc:"TikTok-native, trend-obsessed, budget-conscious"},
-    {label:"Millennial women (25-34)",desc:"Results-driven, willing to invest in quality"},
-    {label:"Men getting into grooming",desc:"New to skincare, want simple routines"},
-    {label:"Skincare beginners",desc:"Overwhelmed, don't know where to start"},
-    {label:"Beauty professionals",desc:"MUAs, estheticians, salon owners"},
-  ],
-  fashion:[
-    {label:"Trend-chasing Gen Z",desc:"Always on the latest micro-trends"},
-    {label:"Streetwear enthusiasts",desc:"Hype culture, drops, limited editions"},
-    {label:"Budget fashionistas",desc:"Want to look good without spending big"},
-    {label:"Professional women",desc:"Work wardrobe, polished looks"},
-    {label:"Sustainable shoppers",desc:"Care about ethical & eco-friendly fashion"},
-  ],
-  food:[
-    {label:"Home cooks",desc:"Love cooking, always trying new recipes"},
-    {label:"Busy parents",desc:"Need quick, easy, kid-friendly meals"},
-    {label:"Health-conscious eaters",desc:"Macros, clean eating, meal prep"},
-    {label:"Foodies & adventurers",desc:"Try anything, love unique flavors"},
-    {label:"College students",desc:"Cheap, fast, dorm-friendly meals"},
-  ],
-  fitness:[
-    {label:"Gym beginners",desc:"Just starting, intimidated, need guidance"},
-    {label:"Home workout crowd",desc:"No gym, limited equipment"},
-    {label:"Athletes & competitors",desc:"Performance-focused, advanced"},
-    {label:"Weight loss seekers",desc:"Want to lose weight, tried diets before"},
-    {label:"Busy professionals",desc:"Short on time, need efficient workouts"},
-  ],
-  tech:[
-    {label:"Early adopters",desc:"Love trying new tech first"},
-    {label:"Small business owners",desc:"Need tools to grow their business"},
-    {label:"Students & young devs",desc:"Learning, building, experimenting"},
-    {label:"Non-tech people",desc:"Want simple solutions, hate complexity"},
-    {label:"Content creators",desc:"Need tools for their creator business"},
-  ],
-  music:[
-    {label:"Music fans (15-25)",desc:"Discover new music daily, playlist curators"},
-    {label:"Aspiring musicians",desc:"Learning instruments, making beats"},
-    {label:"Concert/festival goers",desc:"Live music lovers, experience seekers"},
-    {label:"Music producers",desc:"DAW users, sample hunters, collab seekers"},
-    {label:"Indie music supporters",desc:"Love discovering underground artists"},
-  ],
-  education:[
-    {label:"Career switchers",desc:"Want to learn new skills for a new job"},
-    {label:"Students",desc:"Studying, need help, want shortcuts"},
-    {label:"Side hustlers",desc:"Learning skills to make money on the side"},
-    {label:"Parents",desc:"Want educational content for their kids"},
-    {label:"Professionals upskilling",desc:"Want to advance in current career"},
-  ],
-  business:[
-    {label:"Startup founders",desc:"Building something, need customers"},
-    {label:"Freelancers",desc:"Looking for clients, building personal brand"},
-    {label:"Small business owners",desc:"Local or online, want more sales"},
-    {label:"Solopreneurs",desc:"One-person operation, wearing all hats"},
-    {label:"Agency owners",desc:"Scaling, hiring, getting leads"},
-  ],
-  lifestyle:[
-    {label:"Wellness seekers",desc:"Meditation, journaling, mental health"},
-    {label:"Travel lovers",desc:"Always planning next trip, bucket lists"},
-    {label:"Self-improvement addicts",desc:"Always optimizing, reading, growing"},
-    {label:"Young professionals",desc:"Balancing work and life, adulting"},
-    {label:"Stay-at-home parents",desc:"Looking for fulfillment beyond parenting"},
-  ],
-  ecommerce:[
-    {label:"Impulse shoppers",desc:"See it, want it, buy it"},
-    {label:"Deal hunters",desc:"Love discounts, compare prices"},
-    {label:"Gift shoppers",desc:"Looking for unique, thoughtful gifts"},
-    {label:"Quality-first buyers",desc:"Will pay more for better quality"},
-    {label:"Trend followers",desc:"Buy what's trending on social media"},
-  ],
-};
+var MEDIA_TYPES = [
+  {id:"video",label:"Video",icon:"\u{1f3ac}",color:"#3b82f6",desc:"Reels, TikToks, Stories, video ads"},
+  {id:"picture",label:"Picture",icon:"\u{1f5bc}️",color:"#ec4899",desc:"Static image, graphic, carousel, photo ad"},
+];
 
 var GOALS = [
-  {label:"Stop the Scroll",icon:"\u{1f6d1}",desc:"Make people pause and watch"},
-  {label:"Get Shares",icon:"\u{1f504}",desc:"People send it to friends"},
   {label:"Drive Sales",icon:"\u{1f4b0}",desc:"Get people to buy"},
+  {label:"Get DMs",icon:"\u{1f4e9}",desc:"Drive people to message you"},
   {label:"Get Follows",icon:"\u{2795}",desc:"Grow your audience"},
   {label:"Get Clicks",icon:"\u{1f446}",desc:"Send people to your link"},
-  {label:"Build Trust",icon:"\u{1f91d}",desc:"Position as an authority"},
+  {label:"Get Shares",icon:"\u{1f504}",desc:"People send it to friends"},
+  {label:"Build Trust",icon:"\u{1f91d}",desc:"Position as authority"},
+  {label:"Get Signups",icon:"\u{1f4cb}",desc:"Email list, waitlist, app downloads"},
+  {label:"Stop the Scroll",icon:"\u{1f6d1}",desc:"Make people pause and watch"},
 ];
 
-var FORMATS = [
-  {label:"POV Story",icon:"\u{1f3ac}",desc:"POV: you just discovered...",best:"Product reveals, transformations"},
-  {label:"Before / After",icon:"\u{1f504}",desc:"Show the transformation",best:"Results, makeovers, progress"},
-  {label:"3 Reasons Why",icon:"\u{0033}ï¸â£",desc:"Quick list format",best:"Education, persuasion, tips"},
-  {label:"Day in the Life",icon:"\u{2600}ï¸",desc:"Follow along with someone",best:"Brand awareness, relatability"},
-  {label:"Myth Buster",icon:"\u{1f4a5}",desc:"Everyone thinks X but actually Y",best:"Authority building, engagement"},
-  {label:"Get Ready With Me",icon:"\u{1fa9e}",desc:"Prep routine with product placement",best:"Beauty, fashion, lifestyle"},
-  {label:"Storytime",icon:"\u{1f4d6}",desc:"Tell a compelling story",best:"Emotional connection, virality"},
-  {label:"Tutorial / How-To",icon:"\u{1f393}",desc:"Step-by-step guide",best:"Education, saves, authority"},
-  {label:"Comparison",icon:"\u{2696}ï¸",desc:"This vs That",best:"Product differentiation"},
-  {label:"Unboxing / Reveal",icon:"\u{1f381}",desc:"Surprise opening or reveal",best:"New products, excitement"},
-  {label:"Challenge",icon:"\u{1f525}",desc:"Try this challenge format",best:"Engagement, UGC, shares"},
-  {label:"Testimonial",icon:"\u{2b50}",desc:"Real person, real results",best:"Social proof, trust, ads"},
+var PLATFORMS_ORGANIC = [
+  {id:"tiktok",label:"TikTok",icon:"\u{1f3b5}",color:"#ff0050"},
+  {id:"ig-reel",label:"Instagram Reel",icon:"\u{1f4f8}",color:"#e1306c"},
+  {id:"ig-story",label:"IG Story",icon:"\u{1f4f1}",color:"#833ab4"},
+  {id:"ig-feed",label:"IG Feed Post",icon:"\u{1f4f7}",color:"#c13584"},
+  {id:"yt-short",label:"YouTube Short",icon:"\u{25b6}️",color:"#ff0000"},
+  {id:"twitter",label:"Twitter / X",icon:"\u{1f426}",color:"#1da1f2"},
+  {id:"facebook",label:"Facebook",icon:"\u{1f44d}",color:"#1877f2"},
+];
+
+var PLATFORMS_PAID = [
+  {id:"fb-ads",label:"Facebook / IG Ads",icon:"\u{1f4b0}",color:"#1877f2"},
+  {id:"tiktok-ads",label:"TikTok Ads",icon:"\u{1f4b5}",color:"#ff0050"},
+  {id:"google-ads",label:"Google Ads",icon:"\u{1f50d}",color:"#4285f4"},
+  {id:"yt-ads",label:"YouTube Ads",icon:"\u{1f4fa}",color:"#ff0000"},
+];
+
+var VIDEO_FORMATS = [
+  {label:"POV Story",icon:"\u{1f3ac}",desc:"POV: you just discovered..."},
+  {label:"Before / After",icon:"\u{1f504}",desc:"Show the transformation"},
+  {label:"3 Reasons Why",icon:"3️⃣",desc:"Quick list format"},
+  {label:"Day in the Life",icon:"\u{2600}️",desc:"Follow along"},
+  {label:"Get Ready With Me",icon:"\u{1fa9e}",desc:"Prep routine with product"},
+  {label:"Storytime",icon:"\u{1f4d6}",desc:"Tell a compelling story"},
+  {label:"Tutorial / How-To",icon:"\u{1f393}",desc:"Step-by-step guide"},
+  {label:"Unboxing / Reveal",icon:"\u{1f381}",desc:"Surprise opening"},
+  {label:"Testimonial",icon:"\u{2b50}",desc:"Real person, real results"},
+  {label:"Challenge",icon:"\u{1f525}",desc:"Try this challenge"},
+];
+
+var IMAGE_FORMATS = [
+  {label:"Product Showcase",icon:"\u{1f4f8}",desc:"Clean product shot with text"},
+  {label:"Quote / Text Post",icon:"\u{1f4ac}",desc:"Bold text on branded background"},
+  {label:"Before / After",icon:"\u{1f504}",desc:"Side-by-side transformation"},
+  {label:"Carousel / Swipe",icon:"\u{1f4f0}",desc:"Multi-slide story"},
+  {label:"Testimonial Card",icon:"\u{2b50}",desc:"Customer quote with photo"},
+  {label:"Promo / Sale",icon:"\u{1f525}",desc:"Limited offer, urgency-driven"},
+  {label:"Infographic",icon:"\u{1f4ca}",desc:"Data or steps visualized"},
+  {label:"Meme / Relatable",icon:"\u{1f602}",desc:"Humor-driven shareable image"},
 ];
 
 var HOOKS = [
   {label:"Curiosity Gap",icon:"\u{2753}",desc:"Nobody's talking about this..."},
-  {label:"Shock / Disbelief",icon:"\u{1f631}",desc:"I can't believe this actually works"},
+  {label:"Shock / Disbelief",icon:"\u{1f631}",desc:"I can't believe this works"},
   {label:"Identity / POV",icon:"\u{1fa9e}",desc:"POV: You just found out..."},
   {label:"Authority",icon:"\u{1f451}",desc:"As a [expert], here's what I'd never do"},
-  {label:"Controversial Take",icon:"\u{1f525}",desc:"Hot take: [opinion everyone has but won't say]"},
+  {label:"Controversial Take",icon:"\u{1f525}",desc:"Hot take that gets reactions"},
+  {label:"Question Hook",icon:"\u{1f914}",desc:"Why does nobody talk about this?"},
+  {label:"Number Hook",icon:"\u{1f4ca}",desc:"3 things I wish I knew about..."},
   {label:"Challenge",icon:"\u{1f4aa}",desc:"I tried [thing] for 30 days..."},
-  {label:"Question Hook",icon:"\u{1f914}",desc:"Why does nobody talk about [thing]?"},
-  {label:"Number Hook",icon:"\u{1f4ca}",desc:"3 things I wish I knew about [topic]"},
 ];
 
 var TONES = [
-  {label:"Funny",icon:"\u{1f602}",desc:"Humor-driven, relatable laughs"},
-  {label:"Edgy",icon:"\u{1f608}",desc:"Bold, provocative, pushes boundaries"},
-  {label:"Motivational",icon:"\u{1f4aa}",desc:"Inspiring, empowering, uplifting"},
-  {label:"Educational",icon:"\u{1f4da}",desc:"Teaches something valuable"},
-  {label:"Raw & Authentic",icon:"\u{1f4f1}",desc:"Unfiltered, real, no polish"},
-  {label:"Professional",icon:"\u{1f454}",desc:"Clean, polished, trustworthy"},
-  {label:"Emotional",icon:"\u{1f62d}",desc:"Pulls heartstrings, tells stories"},
-  {label:"Mysterious",icon:"\u{1f576}ï¸",desc:"Dark, intriguing, makes you wonder"},
+  {label:"Funny",icon:"\u{1f602}"},
+  {label:"Edgy",icon:"\u{1f608}"},
+  {label:"Motivational",icon:"\u{1f4aa}"},
+  {label:"Educational",icon:"\u{1f4da}"},
+  {label:"Raw & Authentic",icon:"\u{1f4f1}"},
+  {label:"Professional",icon:"\u{1f454}"},
+  {label:"Emotional",icon:"\u{1f62d}"},
+  {label:"Mysterious",icon:"\u{1f576}️"},
 ];
 
 var STEP_LABELS = [
-  {label:"Your Brand",icon:"\u{1f3af}",color:"#8b5cf6"},
-  {label:"Platform & Audience",icon:"\u{1f4f1}",color:"#6366f1"},
-  {label:"Format & Style",icon:"\u{1f3a8}",color:"#3b82f6"},
-  {label:"Generate Content",icon:"\u{1f916}",color:"#22c55e"},
-  {label:"Your Content Pack",icon:"\u{1f381}",color:"#f97316"},
+  {label:"Pick Website",icon:"\u{1f310}",color:"#8b5cf6"},
+  {label:"Content Type",icon:"\u{1f4f1}",color:"#22c55e"},
+  {label:"Goal & Platform",icon:"\u{1f3af}",color:"#6366f1"},
+  {label:"Style & Format",icon:"\u{1f3a8}",color:"#3b82f6"},
+  {label:"Generate",icon:"\u{1f916}",color:"#22c55e"},
+  {label:"Content Pack",icon:"\u{1f381}",color:"#f97316"},
 ];
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // REUSABLE COMPONENTS
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 
 function TapCard(props) {
   var active = props.active;
@@ -222,7 +157,7 @@ function TapCard(props) {
       h("div",{style:{fontSize:15,fontWeight:600,color:active?"#e2e8f0":"#94a3b8"}}, props.label),
       props.desc && h("div",{style:{fontSize:12,color:"#64748b",marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}, props.desc)
     ),
-    active && h("span",{style:{fontSize:18,color:color,flexShrink:0}}, "â")
+    active && h("span",{style:{fontSize:18,color:color,flexShrink:0}}, "✓")
   );
 }
 
@@ -239,7 +174,7 @@ function TapPill(props) {
     }
   },
     props.icon && h("span",null, props.icon),
-    (active ? "â " : "") + props.label
+    (active ? "✓ " : "") + props.label
   );
 }
 
@@ -264,7 +199,7 @@ function NextBtn(props) {
       color:"#fff", transition:"all 0.2s", marginTop:32,
       boxShadow: dis ? "none" : "0 4px 20px " + (props.color || "#8b5cf6") + "40",
     }
-  }, props.label + " â");
+  }, props.label + " →");
 }
 
 function ProgressBar(props) {
@@ -286,7 +221,7 @@ function CopyBtn(props) {
   return h("button", {
     onClick: function() { navigator.clipboard.writeText(props.text); setCopied(true); setTimeout(function(){setCopied(false);},1500); },
     style:{background:copied?"#14532d":"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"6px 14px",color:copied?"#86efac":"#94a3b8",fontSize:13,cursor:"pointer",fontWeight:600,transition:"all 0.2s"}
-  }, copied ? "â Copied!" : "\u{1f4cb} Copy");
+  }, copied ? "✓ Copied!" : "\u{1f4cb} Copy");
 }
 
 function Card(props) {
@@ -304,26 +239,29 @@ function LoadingDots() {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // AI GENERATION
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 
-function generateWithAI(selections, apiKey, onResult, onError) {
-  var isPaid = PLATFORMS.find(function(p){return p.label===selections.platform;});
-  isPaid = isPaid && isPaid.type === "paid";
+function generateWithAI(sel, apiKey, onResult, onError) {
+  var isImage = sel.mediaType === "picture";
+  var isPaid = sel.contentType === "paid";
+  var site = WEBSITES.find(function(w){return w.id===sel.website;});
+  var siteName = site ? site.label : "Brand";
+  var siteUrl = site ? site.url : "";
 
-  var sysPrompt = "You are a world-class viral content strategist and copywriter. Generate content based on the user's selections. Return ONLY valid JSON with this exact structure: {\"scripts\":[{\"title\":\"...\",\"content\":\"...\"},...],\"hooks\":[\"...\"],\"captions\":[\"...\"],\"adCopy\":\"...\",\"shotList\":\"...\"}. Generate 3 scripts, 5 hooks, 3 captions." + (isPaid ? " Include compelling ad copy with headline, primary text, and CTA." : " Set adCopy to empty string.") + " Make everything specific to their brand, niche, audience, and platform. Be creative, punchy, and viral-worthy. Match the tone they selected.";
+  var sysPrompt = "You are a world-class viral content strategist. Generate content for " + siteName + " (" + siteUrl + "). Return ONLY valid JSON: {\"scripts\":[{\"title\":\"...\",\"content\":\"...\"},...],\"hooks\":[\"...\"],\"captions\":[\"...\"],\"adCopy\":\"...\",\"shotList\":\"...\"}. Generate 3 " + (isImage ? "image ad concepts (each with HEADLINE, BODY TEXT, CTA, VISUAL DESCRIPTION)" : "scripts with timing and stage directions") + ", 5 hooks, 3 captions." + (isPaid ? " Include compelling ad copy with headline, primary text, CTA." : " Set adCopy to empty string.") + (isImage ? " For shotList provide image composition guidance." : " For shotList provide shot-by-shot filming guide.") + " Match the tone: " + sel.tone + ". Goal: " + sel.goal + ".";
 
-  var userPrompt = "Brand: " + selections.brand +
-    "\nNiche: " + selections.niche +
-    "\nProduct: " + selections.product +
-    "\nPlatform: " + selections.platform +
-    "\nAudience: " + selections.audience +
-    "\nGoal: " + selections.goal +
-    "\nContent Format: " + selections.format +
-    "\nHook Style: " + selections.hook +
-    "\nTone: " + selections.tone +
-    "\n\nGenerate viral content for this exact combination. Make the scripts detailed with stage directions and timing. Hooks should be under 2 seconds when spoken. Captions should include relevant hashtags.";
+  var userPrompt = "Website: " + siteName + " (" + siteUrl + ")" +
+    "\nContent Type: " + (isPaid ? "Paid Ad" : "Organic Content") +
+    "\nMedia: " + (isImage ? "Static Image" : "Video") +
+    "\nPlatform: " + sel.platform +
+    "\nGoal: " + sel.goal +
+    "\nFormat: " + sel.format +
+    "\nHook Style: " + sel.hook +
+    "\nTone: " + sel.tone +
+    (sel.infoBank ? "\n\nAdditional Context:\n" + sel.infoBank : "") +
+    "\n\nGenerate viral content. Be specific to this brand and platform.";
 
   fetch("https://api.openai.com/v1/chat/completions", {
     method:"POST",
@@ -331,8 +269,7 @@ function generateWithAI(selections, apiKey, onResult, onError) {
     body: JSON.stringify({
       model:"gpt-4o-mini",
       messages:[{role:"system",content:sysPrompt},{role:"user",content:userPrompt}],
-      temperature:0.9,
-      max_tokens:3000,
+      temperature:0.9,max_tokens:3000,
     })
   })
   .then(function(r){return r.json();})
@@ -341,103 +278,100 @@ function generateWithAI(selections, apiKey, onResult, onError) {
     try{
       var content = data.choices[0].message.content;
       content = content.replace(/```json\n?/g,"").replace(/```\n?/g,"").trim();
-      var parsed = JSON.parse(content);
-      onResult(parsed);
+      onResult(JSON.parse(content));
     }catch(e){onError("Failed to parse AI response. Try again.");}
   })
   .catch(function(e){onError("Network error: " + e.message);});
 }
 
-function generateFallback(selections) {
-  var brand = selections.brand || "Your Brand";
-  var product = selections.product || "your product";
-  var audience = selections.audience || "your audience";
-  var platform = selections.platform || "social media";
-  var format = selections.format || "video";
-  var hook = selections.hook || "curiosity";
-  var tone = selections.tone || "authentic";
+function generateFallback(sel) {
+  var site = WEBSITES.find(function(w){return w.id===sel.website;});
+  var brand = site ? site.label : "Your Brand";
+  var isImage = sel.mediaType === "picture";
+  var isPaid = sel.contentType === "paid";
+  var goal = sel.goal || "engagement";
+  var tone = sel.tone || "authentic";
+  var format = sel.format || "content";
+
+  var scripts = isImage ? [
+    {title:"Image Concept A", content:"HEADLINE: \"" + brand + " — built different.\"\n\nBODY: The " + goal.toLowerCase() + " solution you've been waiting for.\n\nCTA: \"Tap to learn more\" or \"DM us now\"\n\nVISUAL: Clean product/brand shot, bold headline overlay, " + tone.toLowerCase() + " color palette"},
+    {title:"Image Concept B", content:"HEADLINE: \"This changes everything.\"\n\nBODY: " + brand + " just made " + goal.toLowerCase() + " effortless.\n\nCTA: \"Link in bio\" or \"Send us a DM\"\n\nVISUAL: Lifestyle photo, minimal text, aspirational vibe"},
+    {title:"Image Concept C", content:"HEADLINE: \"Don't sleep on " + brand + ".\"\n\nBODY: Thousands already know. Now it's your turn.\n\nCTA: \"Tap now\" or \"DM for details\"\n\nVISUAL: Bold graphic with urgency element, eye-catching contrast"},
+  ] : [
+    {title:format + " — Option A", content:"HOOK (0-2s): \"Nobody talks about this " + brand + " secret...\"\n\nBUILD (2-8s): Show the problem. Make it relatable. " + tone + " energy.\n\nPAYOFF (8-15s): Reveal " + brand + " as the answer.\n\nCTA: \"Follow for more\" or \"Link in bio\""},
+    {title:format + " — Option B", content:"HOOK (0-2s): \"POV: You finally found " + brand + "\"\n\nBUILD (2-8s): Start with frustration. Show failed attempts.\n\nPAYOFF (8-15s): The moment they discover " + brand + ". Genuine reaction.\n\nCTA: \"Save this for later\""},
+    {title:format + " — Option C", content:"HOOK (0-2s): \"3 things about " + brand + " that will blow your mind\"\n\nPOINT 1 (2-5s): The surprising fact\n\nPOINT 2 (5-8s): Why " + brand + " does it differently\n\nPOINT 3 (8-12s): The result that speaks for itself\n\nCTA: \"Which one surprised you?\""},
+  ];
 
   return {
-    scripts: [
-      {title: format + " Script â Option A", content: "HOOK (0-2s): \"Nobody talks about this " + product.toLowerCase() + " hack...\"\n\nBUILD (2-8s): Show the problem " + audience.toLowerCase() + " faces every day. Make it relatable. Use " + tone.toLowerCase() + " energy.\n\nPAYOFF (8-15s): Reveal " + brand + " as the solution. Show the transformation.\n\nCTA: \"Follow for more\" or \"Link in bio\"\n\nStyle: " + tone + " | Platform: " + platform},
-      {title: format + " Script â Option B", content: "HOOK (0-2s): \"POV: You finally found the " + product.toLowerCase() + " that actually works\"\n\nBUILD (2-8s): Start with the frustration. Show failed attempts. Build tension.\n\nPAYOFF (8-15s): The moment they discover " + brand + ". Show genuine reaction.\n\nCTA: \"Save this for later\" \n\nStyle: " + tone + " | Platform: " + platform},
-      {title: format + " Script â Option C", content: "HOOK (0-2s): \"3 things about " + product.toLowerCase() + " that will blow your mind\"\n\nPOINT 1 (2-5s): The surprising fact most people don't know\n\nPOINT 2 (5-8s): Why " + brand + " does it differently\n\nPOINT 3 (8-12s): The result that speaks for itself\n\nCTA: \"Which one surprised you? Comment below\" \n\nStyle: " + tone + " | Platform: " + platform},
-    ],
+    scripts: scripts,
     hooks: [
-      "Nobody's talking about this " + product.toLowerCase() + " secret...",
+      "Nobody's talking about " + brand + "...",
       "POV: You just discovered " + brand,
-      "Stop scrolling if you're into " + product.toLowerCase(),
-      "I tried every " + product.toLowerCase() + " and this one actually works",
-      "This is for my " + audience.toLowerCase() + " out there",
+      "Stop scrolling if you need " + goal.toLowerCase(),
+      "I tried everything and " + brand + " actually works",
+      "This one's for everyone trying to " + goal.toLowerCase(),
     ],
     captions: [
       "This changed everything \u{1f631} #" + brand.replace(/\s/g,"") + " #viral #fyp",
-      "Save this for later, you'll need it \u{1f516} #" + product.replace(/\s/g,"").toLowerCase() + " #" + (platform==="TikTok"?"fyp":"reels"),
-      "Tag someone who needs to see this \u{1f447} #" + brand.replace(/\s/g,"") + " #gamechanger",
+      "Save this for later \u{1f516} #" + brand.replace(/\s/g,"") + " #gamechanger",
+      "Tag someone who needs this \u{1f447} #" + brand.replace(/\s/g,"") + " #fyp",
     ],
-    adCopy: selections.platform && PLATFORMS.find(function(p){return p.label===selections.platform && p.type==="paid";}) ?
-      "HEADLINE: The #1 " + product + " for " + audience + "\n\nPRIMARY TEXT: Tired of " + product.toLowerCase() + " that doesn't work? " + brand + " is different. Join thousands who already made the switch.\n\nâ Real results\nâ 30-day guarantee\nâ Free shipping\n\nCTA: Shop Now" : "",
-    shotList: "SHOT LIST for " + brand + "\n\n\u{1f3ac} SHOT 1 â THE HOOK (0-2s)\nClose-up, grab attention immediately\nStyle: " + tone + "\n\n\u{1f3ac} SHOT 2 â THE PROBLEM (2-5s)\nShow the pain point " + audience.toLowerCase() + " relates to\n\n\u{1f3ac} SHOT 3 â THE REVEAL (5-10s)\nIntroduce " + brand + " naturally\n\n\u{1f3ac} SHOT 4 â THE PAYOFF (10-15s)\nShow the result/transformation\nEnd with CTA",
+    adCopy: isPaid? "HEADLINE: " + brand + " — Your " + goal + " Solution\n\nPRIMARY TEXT: Ready to " + goal.toLowerCase() + "? " + brand + " makes it simple.\n\n✓ Real results\n✓ Trusted platform\n✓ Join thousands\n\nCTA: Learn More" : "",
+    shotList: isImage ?
+      "IMAGE COMPOSITION for " + brand + "\n\n\u{1f5bc�������UE��6�V��W�R�6F6���r6���6�F�����&��B�VFƖ�RFW�BBF��"6V�Nter\nBrand prominent but not cluttered\n\n\u{1f3a8} STYLE\n" + tone + " vibe\nHigh contrast for scroll-stopping impact\n\n\u{1f4dd} TEXT\nKeep to 5-8 words max on image\nCTA button directing to action\n\n\u{1f4f0} SPECS\n1080x1080 for feed\n1080x1920 for stories"
+      : "SHOT LIST for " + brand + "\n\n\u{1f3ac} SHOT 1 — HOOK (0-2s)\nGrab attention immediately\n\n\u{1f3ac} SHOT 2 — PROBLEM (2-5s)\nShow the pain point\n\n\u{1f3ac} SHOT 3 — REVEAL (5-10s)\nIntroduce " + brand + "\n\n\u{1f3ac} SHOT 4 — PAYOFF (10-15s)\nShow the result + CTA",
   };
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 // MAIN APP
-// âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ═══════════════════════════════════════════════════════════
 
 function App() {
   var _view = useState("home"), view = _view[0], setView = _view[1];
   var _step = useState(0), step = _step[0], setStep = _step[1];
   var _tab = useState("create"), tab = _tab[0], setTab = _tab[1];
 
-  // Selections â all taps, minimal typing
-  var _brand = useState(""), brand = _brand[0], setBrand = _brand[1];
-  var _niche = useState(""), niche = _niche[0], setNiche = _niche[1];
-  var _product = useState(""), product = _product[0], setProduct = _product[1];
+  // Wizard selections
+  var _website = useState(""), website = _website[0], setWebsite = _website[1];
+  var _contentType = useState(""), contentType = _contentType[0], setContentType = _contentType[1];
+  var _mediaType = useState(""), mediaType = _mediaType[0], setMediaType = _mediaType[1];
   var _platform = useState(""), platform = _platform[0], setPlatform = _platform[1];
-  var _audience = useState(""), audience = _audience[0], setAudience = _audience[1];
   var _goal = useState(""), goal = _goal[0], setGoal = _goal[1];
   var _format = useState(""), format = _format[0], setFormat = _format[1];
   var _hookStyle = useState(""), hookStyle = _hookStyle[0], setHookStyle = _hookStyle[1];
   var _tone = useState(""), tone = _tone[0], setTone = _tone[1];
 
-  // AI results
+  // AI
   var _aiResult = useState(null), aiResult = _aiResult[0], setAiResult = _aiResult[1];
   var _loading = useState(false), loading = _loading[0], setLoading = _loading[1];
   var _aiError = useState(""), aiError = _aiError[0], setAiError = _aiError[1];
   var _pickedScript = useState(0), pickedScript = _pickedScript[0], setPickedScript = _pickedScript[1];
 
-  // Settings & saved
-  var _apiKey = useState(function(){try{return localStorage.getItem("vcos_apikey")||"";}catch(e){return "";}}), apiKey = _apiKey[0], setApiKey = _apiKey[1];
-  var _savedBrands = useState(function(){try{return JSON.parse(localStorage.getItem("vcos_brands")||"[]");}catch(e){return [];}}), savedBrands = _savedBrands[0], setSavedBrands = _savedBrands[1];
-  var _projects = useState(function(){try{return JSON.parse(localStorage.getItem("vcos_projects")||"[]");}catch(e){return [];}}), projects = _projects[0], setProjects = _projects[1];
-  var _showNewBrand = useState(false), showNewBrand = _showNewBrand[0], setShowNewBrand = _showNewBrand[1];
-  var _newBrandName = useState(""), newBrandName = _newBrandName[0], setNewBrandName = _newBrandName[1];
+  // Settings & persistence
+  var _apiKey = useState(function(){try{return localStorage.getItem("vcos3_apikey")||"";}catch(e){return "";}}), apiKey = _apiKey[0], setApiKey = _apiKey[1];
+  var _projects = useState(function(){try{return JSON.parse(localStorage.getItem("vcos3_projects")||"[]");}catch(e){return [];}}), projects = _projects[0], setProjects = _projects[1];
+  var _infoBank = useState(function(){try{return JSON.parse(localStorage.getItem("vcos3_infobank")||"{}");}catch(e){return {};}}), infoBank = _infoBank[0], setInfoBank = _infoBank[1];
+  var _editingInfo = useState(""), editingInfo = _editingInfo[0], setEditingInfo = _editingInfo[1];
 
   // Persist
-  useEffect(function(){try{localStorage.setItem("vcos_apikey",apiKey);}catch(e){}},[apiKey]);
-  useEffect(function(){try{localStorage.setItem("vcos_brands",JSON.stringify(savedBrands));}catch(e){}},[savedBrands]);
-  useEffect(function(){try{localStorage.setItem("vcos_projects",JSON.stringify(projects));}catch(e){}},[projects]);
+  useEffect(function(){try{localStorage.setItem("vcos3_apikey",apiKey);}catch(e){}},[apiKey]);
+  useEffect(function(){try{localStorage.setItem("vcos3_projects",JSON.stringify(projects));}catch(e){}},[projects]);
+  useEffect(function(){try{localStorage.setItem("vcos3_infobank",JSON.stringify(infoBank));}catch(e){}},[infoBank]);
 
   var resetWizard = function() {
-    setStep(0); setBrand(""); setNiche(""); setProduct(""); setPlatform("");
-    setAudience(""); setGoal(""); setFormat(""); setHookStyle(""); setTone("");
-    setAiResult(null); setAiError(""); setPickedScript(0); setShowNewBrand(false);
-    setNewBrandName(""); setView("wizard");
-  };
-
-  var saveBrand = function(name) {
-    if(name && savedBrands.indexOf(name) === -1) {
-      setSavedBrands(savedBrands.concat([name]));
-    }
+    setStep(0); setWebsite(""); setContentType(""); setMediaType(""); setPlatform("");
+    setGoal(""); setFormat(""); setHookStyle(""); setTone("");
+    setAiResult(null); setAiError(""); setPickedScript(0); setView("wizard");
   };
 
   var doGenerate = function() {
     setLoading(true); setAiError(""); setAiResult(null);
-    var sel = {brand:brand,niche:niche,product:product,platform:platform,audience:audience,goal:goal,format:format,hook:hookStyle,tone:tone};
+    var sel = {website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,hook:hookStyle,tone:tone,infoBank:infoBank[website]||""};
     if(apiKey) {
       generateWithAI(sel, apiKey, function(result){setAiResult(result);setLoading(false);}, function(err){
-        setAiResult(generateFallback(sel));setAiError("AI error: "+err+" â Showing template results instead.");setLoading(false);
+        setAiResult(generateFallback(sel));setAiError("AI error: "+err+" — Showing templates instead.");setLoading(false);
       });
     } else {
       setTimeout(function(){setAiResult(generateFallback(sel));setLoading(false);},800);
@@ -445,105 +379,100 @@ function App() {
   };
 
   var saveProject = function() {
-    var p = {id:Date.now(),name:brand||"Untitled",niche:niche,platform:platform,date:new Date().toLocaleDateString(),selections:{brand:brand,niche:niche,product:product,platform:platform,audience:audience,goal:goal,format:format,hook:hookStyle,tone:tone},result:aiResult,pickedScript:pickedScript};
+    var site = WEBSITES.find(function(w){return w.id===website;});
+    var p = {id:Date.now(),name:site?site.label:"Untitled",website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,date:new Date().toLocaleDateString(),result:aiResult,pickedScript:pickedScript};
     setProjects(function(prev){return [p].concat(prev);});
-    saveBrand(brand);
   };
 
-  // âââ STEP 0: BRAND & NICHE âââââââââââââââââââââââââââââ
+  // ─── STEP 0: PICK WEBSITE ─────────────────────────────
 
   var Step0 = function() {
-    var products = PRODUCTS[niche] || [];
     return h("div",{className:"fade-in"},
-      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f3af} What's This For?"),
-      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "Pick your brand and category. Just tap â no typing needed."),
+      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f310} What website is this for?"),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "Tap the website you're creating content for."),
 
-      // Brand selection
-      h(Section,{icon:"\u{1f3f7}ï¸",title:"Your Brand",sub:"Pick a saved brand or add a new one"}),
-      savedBrands.length > 0 && h("div",{style:{display:"flex",flexDirection:"column",gap:8,marginBottom:12}},
-        savedBrands.map(function(b){
-          return h(TapCard,{key:b,label:b,icon:"\u{2b50}",active:brand===b,onClick:function(){setBrand(b);setShowNewBrand(false);}});
-        })
-      ),
-      h("button",{
-        onClick:function(){setShowNewBrand(!showNewBrand);},
-        style:{width:"100%",padding:"14px 16px",background:showNewBrand?"#8b5cf615":"#0f172a",border:showNewBrand?"2px solid #8b5cf6":"2px dashed #334155",borderRadius:14,color:showNewBrand?"#e2e8f0":"#94a3b8",fontSize:15,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:10,transition:"all 0.2s"}
-      }, h("span",{style:{fontSize:22}}, "\u{2795}"), " New Brand"),
-
-      showNewBrand && h("div",{style:{marginTop:12}},
-        h("input",{
-          value:newBrandName,
-          onChange:function(e){setNewBrandName(e.target.value);setBrand(e.target.value);},
-          placeholder:"Type your brand name...",
-          autoFocus:true,
-          style:{width:"100%",padding:"14px 16px",background:"#0f172a",border:"2px solid #8b5cf6",borderRadius:14,color:"#e2e8f0",fontSize:15,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}
-        })
-      ),
-
-      // Niche
-      h(Section,{icon:"\u{1f4c2}",title:"Your Niche",sub:"What category is your brand in?"}),
-      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
-        NICHES.map(function(n){
-          return h("button",{key:n.id,onClick:function(){setNiche(n.id);setProduct("");setAudience("");},
+      h("div",{style:{display:"flex",flexDirection:"column",gap:10}},
+        WEBSITES.map(function(w){
+          return h("button",{key:w.id,onClick:function(){setWebsite(w.id);},
             style:{
-              padding:"16px 12px",borderRadius:14,cursor:"pointer",textAlign:"center",transition:"all 0.2s",
-              background:niche===n.id?n.color+"15":"#0f172a",
-              border:niche===n.id?"2px solid "+n.color:"2px solid #1e293b",
+              display:"flex",alignItems:"center",gap:14,width:"100%",padding:"18px 20px",
+              background:website===w.id?w.color+"15":"#0f172a",
+              border:website===w.id?"2px solid "+w.color:"2px solid #1e293b",
+              borderRadius:16,cursor:"pointer",textAlign:"left",transition:"all 0.2s",
             }
           },
-            h("div",{style:{fontSize:28,marginBottom:6}},n.icon),
-            h("div",{style:{fontSize:13,fontWeight:600,color:niche===n.id?"#e2e8f0":"#94a3b8"}},n.label)
+            h("span",{style:{fontSize:32,flexShrink:0}},w.icon),
+            h("div",{style:{flex:1}},
+              h("div",{style:{fontSize:17,fontWeight:700,color:website===w.id?"#e2e8f0":"#94a3b8"}},w.label),
+              h("div",{style:{fontSize:13,color:"#64748b",marginTop:2}},w.url)
+            ),
+            website===w.id && h("span",{style:{fontSize:20,color:w.color}},"✓"),
+            infoBank[w.id] && h("span",{style:{fontSize:10,background:"#1e293b",color:"#94a3b8",padding:"3px 8px",borderRadius:99,marginLeft:4}},"\u{1f4dd} Info")
           );
         })
       ),
 
-      // Product type (based on niche)
-      niche && h("div",null,
-        h(Section,{icon:"\u{1f6cd}ï¸",title:"What Are You Promoting?",sub:"Pick the closest match"}),
-        h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-          products.map(function(p){
-            return h(TapCard,{key:p,label:p,icon:NICHES.find(function(n){return n.id===niche;}).icon,active:product===p,color:NICHES.find(function(n){return n.id===niche;}).color,onClick:function(){setProduct(p);}});
+      h(NextBtn,{onClick:function(){setStep(1);},label:"Next: Content Type",disabled:!website,color:STEP_LABELS[1].color})
+    );
+  };
+
+  // ─── STEP 1: ORGANIC OR PAID + PICTURE OR VIDEO ────────
+
+  var Step1 = function() {
+    return h("div",{className:"fade-in"},
+      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f4f1} What kind of content?"),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "Two quick taps."),
+
+      h(Section,{icon:"\u{1f4e2}",title:"Organic or Paid?",sub:"Is this a free post or a paid ad?"}),
+      h("div",{style:{display:"flex",gap:10}},
+        CONTENT_TYPES.map(function(ct){
+          return h("button",{key:ct.id,onClick:function(){setContentType(ct.id);setPlatform("");},
+            style:{
+              flex:1,padding:"20px 16px",borderRadius:16,cursor:"pointer",textAlign:"center",transition:"all 0.2s",
+              background:contentType===ct.id?ct.color+"15":"#0f172a",
+              border:contentType===ct.id?"2px solid "+ct.color:"2px solid #1e293b",
+            }
+          },
+            h("div",{style:{fontSize:36,marginBottom:8}},ct.icon),
+            h("div",{style:{fontSize:16,fontWeight:700,color:contentType===ct.id?"#e2e8f0":"#94a3b8"}},ct.label),
+            h("div",{style:{fontSize:12,color:"#64748b",marginTop:4}},ct.desc)
+          );
+        })
+      ),
+
+      contentType && h("div",null,
+        h(Section,{icon:"\u{1f3a5}",title:"Picture or Video?",sub:"What are you making?"}),
+        h("div",{style:{display:"flex",gap:10}},
+          MEDIA_TYPES.map(function(mt){
+            return h("button",{key:mt.id,onClick:function(){setMediaType(mt.id);setFormat("");},
+              style:{
+                flex:1,padding:"20px 16px",borderRadius:16,cursor:"pointer",textAlign:"center",transition:"all 0.2s",
+                background:mediaType===mt.id?mt.color+"15":"#0f172a",
+                border:mediaType===mt.id?"2px solid "+mt.color:"2px solid #1e293b",
+              }
+            },
+              h("div",{style:{fontSize:36,marginBottom:8}},mt.icon),
+              h("div",{style:{fontSize:16,fontWeight:700,color:mediaType===mt.id?"#e2e8f0":"#94a3b8"}},mt.label),
+              h("div",{style:{fontSize:12,color:"#64748b",marginTop:4}},mt.desc)
+            );
           })
         )
       ),
 
-      h(NextBtn,{onClick:function(){setStep(1);},label:"Next: Pick Platform & Audience",disabled:!brand||!niche||!product,color:STEP_LABELS[1].color})
+      h(NextBtn,{onClick:function(){setStep(2);},label:"Next: Goal & Platform",disabled:!contentType||!mediaType,color:STEP_LABELS[2].color})
     );
   };
 
-  // âââ STEP 1: PLATFORM & AUDIENCE âââââââââââââââââââââââ
+  // ─── STEP 2: GOAL & PLATFORM ──────────────────────────
 
-  var Step1 = function() {
-    var auds = AUDIENCES[niche] || [];
-    var organicPlatforms = PLATFORMS.filter(function(p){return p.type==="organic";});
-    var paidPlatforms = PLATFORMS.filter(function(p){return p.type==="paid";});
+  var Step2 = function() {
+    var platforms = contentType === "paid" ? PLATFORMS_PAID : PLATFORMS_ORGANIC;
 
     return h("div",{className:"fade-in"},
-      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f4f1} Where & Who?"),
-      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "Pick your platform, audience, and goal. All taps."),
+      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f3af} Goal & Platform"),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "What's the point of this content and where does it go?"),
 
-      h(Section,{icon:"\u{1f310}",title:"Organic Platforms",sub:"Free posting â pick one"}),
-      h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        organicPlatforms.map(function(p){
-          return h(TapCard,{key:p.id,label:p.label,icon:p.icon,color:p.color,active:platform===p.label,onClick:function(){setPlatform(p.label);}});
-        })
-      ),
-
-      h(Section,{icon:"\u{1f4b0}",title:"Paid Ads",sub:"Paid advertising â pick one"}),
-      h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        paidPlatforms.map(function(p){
-          return h(TapCard,{key:p.id,label:p.label,icon:p.icon,color:p.color,active:platform===p.label,onClick:function(){setPlatform(p.label);}});
-        })
-      ),
-
-      h(Section,{icon:"\u{1f465}",title:"Your Audience",sub:"Who are you trying to reach?"}),
-      h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        auds.map(function(a){
-          return h(TapCard,{key:a.label,label:a.label,desc:a.desc,icon:"\u{1f464}",active:audience===a.label,onClick:function(){setAudience(a.label);}});
-        })
-      ),
-
-      h(Section,{icon:"\u{1f3af}",title:"Your Goal",sub:"What should this content DO?"}),
+      h(Section,{icon:"\u{1f3af}",title:"What's the goal?",sub:"What should this content do?"}),
       h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
         GOALS.map(function(g){
           return h("button",{key:g.label,onClick:function(){setGoal(g.label);},
@@ -560,20 +489,29 @@ function App() {
         })
       ),
 
-      h(NextBtn,{onClick:function(){setStep(2);},label:"Next: Pick Format & Style",disabled:!platform||!audience||!goal,color:STEP_LABELS[2].color})
+      h(Section,{icon:"\u{1f4cd}",title:"Where is this going?",sub:"Pick the platform"}),
+      h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+        platforms.map(function(p){
+          return h(TapCard,{key:p.id,label:p.label,icon:p.icon,color:p.color,active:platform===p.label,onClick:function(){setPlatform(p.label);}});
+        })
+      ),
+
+      h(NextBtn,{onClick:function(){setStep(3);},label:"Next: Style & Format",disabled:!goal||!platform,color:STEP_LABELS[3].color})
     );
   };
 
-  // âââ STEP 2: FORMAT & STYLE ââââââââââââââââââââââââââââ
+  // ─── STEP 3: STYLE & FORMAT ───────────────────────────
 
-  var Step2 = function() {
+  var Step3 = function() {
+    var formats = mediaType === "picture" ? IMAGE_FORMATS : VIDEO_FORMATS;
+
     return h("div",{className:"fade-in"},
-      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f3a8} Format & Style"),
-      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "How should your content look and feel? Pick one from each."),
+      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f3a8} Style & Format"),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "How should it look and feel?"),
 
-      h(Section,{icon:"\u{1f3ac}",title:"Content Format",sub:"Pick a proven format"}),
+      h(Section,{icon:mediaType==="picture"?"\u{1f5bc}️":"\u{1f3ac}",title:mediaType==="picture"?"Image Format":"Video Format",sub:"Pick a format"}),
       h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
-        FORMATS.map(function(f){
+        formats.map(function(f){
           return h("button",{key:f.label,onClick:function(){setFormat(f.label);},
             style:{
               padding:"14px 12px",borderRadius:14,cursor:"pointer",textAlign:"left",transition:"all 0.2s",
@@ -588,114 +526,102 @@ function App() {
         })
       ),
 
-      h(Section,{icon:"\u{1f3a3}",title:"Hook Style",sub:"How will you grab attention in the first 2 seconds?"}),
+      h(Section,{icon:"\u{1f3a3}",title:"Hook Style",sub:"How do you grab attention?"}),
       h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
         HOOKS.map(function(hk){
           return h(TapCard,{key:hk.label,label:hk.label,desc:hk.desc,icon:hk.icon,active:hookStyle===hk.label,color:"#3b82f6",onClick:function(){setHookStyle(hk.label);}});
         })
       ),
 
-      h(Section,{icon:"\u{1f3a4}",title:"Tone & Vibe",sub:"What energy should this have?"}),
+      h(Section,{icon:"\u{1f3a4}",title:"Tone & Vibe",sub:"What energy?"}),
       h("div",{style:{display:"flex",flexWrap:"wrap",gap:8}},
         TONES.map(function(t){
           return h(TapPill,{key:t.label,label:t.label,icon:t.icon,active:tone===t.label,onClick:function(){setTone(t.label);}});
         })
       ),
 
-      h(NextBtn,{onClick:function(){setStep(3);doGenerate();},label:apiKey?"Generate with AI \u{1f916}":"Generate Content",disabled:!format||!hookStyle||!tone,color:STEP_LABELS[3].color})
+      h(NextBtn,{onClick:function(){setStep(4);doGenerate();},label:apiKey?"Generate with AI \u{1f916}":"Generate Content",disabled:!format||!hookStyle||!tone,color:STEP_LABELS[4].color})
     );
   };
 
-  // âââ STEP 3: AI GENERATION âââââââââââââââââââââââââââââ
+  // ─── STEP 4: GENERATE ─────────────────────────────────
 
-  var Step3 = function() {
+  var Step4 = function() {
     if(loading) {
       return h("div",{style:{textAlign:"center",padding:"60px 0"}},
         h(LoadingDots),
-        h("p",{style:{color:"#8b5cf6",fontSize:16,fontWeight:600,marginTop:16}}, apiKey ? "\u{1f916} AI is writing your content..." : "\u{2699}ï¸ Generating templates..."),
+        h("p",{style:{color:"#8b5cf6",fontSize:16,fontWeight:600,marginTop:16}}, apiKey ? "\u{1f916} AI is writing your content..." : "\u{2699}️ Generating templates..."),
         h("p",{style:{color:"#64748b",fontSize:13,marginTop:8}}, "This takes a few seconds")
       );
     }
-
     if(!aiResult) {
       return h("div",{style:{textAlign:"center",padding:"60px 0"}},
-        h("p",{style:{color:"#94a3b8"}}, "Something went wrong. "),
+        h("p",{style:{color:"#94a3b8"}}, "Something went wrong."),
         h("button",{onClick:doGenerate,style:{marginTop:16,padding:"12px 24px",borderRadius:12,border:"none",background:"#8b5cf6",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer"}}, "Try Again")
       );
     }
 
+    var siteName = (WEBSITES.find(function(w){return w.id===website;})||{}).label||"";
     return h("div",{className:"fade-in"},
       h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f916} Your Content"),
-      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 8px"}}, "Pick your favorite script. Tap to select."),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 8px"}}, siteName + " • " + (contentType==="paid"?"Paid Ad":"Organic") + " • " + (mediaType==="picture"?"Picture":"Video")),
 
       aiError && h(Card,{glow:"#f59e0b",style:{marginBottom:16}},
-        h("p",{style:{color:"#fbbf24",fontSize:13,margin:0}}, "â ï¸ " + aiError)
+        h("p",{style:{color:"#fbbf24",fontSize:13,margin:0}}, "⚠️ " + aiError)
       ),
-
       !apiKey && h(Card,{glow:"#6366f1",style:{marginBottom:16}},
-        h("p",{style:{color:"#a5b4fc",fontSize:13,margin:0}}, "\u{1f4a1} Add an OpenAI API key in Settings for AI-powered content that's way better than these templates.")
+        h("p",{style:{color:"#a5b4fc",fontSize:13,margin:0}}, "\u{1f4a1} Add an OpenAI API key in Settings for way better AI-generated content.")
       ),
 
-      // Script options
       h(Section,{icon:"\u{1f4c4}",title:"Pick a Script",sub:"Tap your favorite"}),
       aiResult.scripts && aiResult.scripts.map(function(s,i){
         var picked = pickedScript === i;
         return h("button",{key:i,onClick:function(){setPickedScript(i);},
-          style:{
-            width:"100%",textAlign:"left",cursor:"pointer",marginBottom:12,
-            background:picked?"#22c55e10":"#0f172a",
-            border:picked?"2px solid #22c55e":"2px solid #1e293b",
-            borderRadius:16,padding:16,transition:"all 0.2s",
-          }
+          style:{width:"100%",textAlign:"left",cursor:"pointer",marginBottom:12,background:picked?"#22c55e10":"#0f172a",border:picked?"2px solid #22c55e":"2px solid #1e293b",borderRadius:16,padding:16,transition:"all 0.2s"}
         },
           h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
             h("span",{style:{fontSize:15,fontWeight:700,color:picked?"#86efac":"#e2e8f0"}}, s.title || ("Option " + (i+1))),
-            picked && h("span",{style:{background:"#14532d",color:"#86efac",padding:"4px 12px",borderRadius:99,fontSize:12,fontWeight:700}}, "â Selected")
+            picked && h("span",{style:{background:"#14532d",color:"#86efac",padding:"4px 12px",borderRadius:99,fontSize:12,fontWeight:700}}, "✓ Selected")
           ),
           h("pre",{style:{fontSize:13,color:"#94a3b8",whiteSpace:"pre-wrap",lineHeight:1.6,margin:0,fontFamily:"inherit"}}, s.content)
         );
       }),
 
-      // Quick remix buttons
       h("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:8}},
-        ["\u{1f504} Regenerate","\u{1f525} Make Edgier","\u{1f602} Add Humor","\u{2702}ï¸ Make Shorter"].map(function(label){
-          return h("button",{key:label,onClick:function(){
-            if(label.indexOf("Regenerate")!==-1){doGenerate();}
-          },style:{padding:"10px 16px",borderRadius:99,border:"1px solid #334155",background:"transparent",color:"#94a3b8",fontSize:13,cursor:"pointer",fontWeight:500}},label);
+        ["\u{1f504} Regenerate","\u{1f525} Make Edgier","\u{1f602} Add Humor","\u{2702}️ Make Shorter"].map(function(label){
+          return h("button",{key:label,onClick:function(){if(label.indexOf("Regenerate")!==-1){doGenerate();}},style:{padding:"10px 16px",borderRadius:99,border:"1px solid #334155",background:"transparent",color:"#94a3b8",fontSize:13,cursor:"pointer",fontWeight:500}},label);
         })
       ),
 
-      h(NextBtn,{onClick:function(){saveProject();setStep(4);},label:"Save & Get Content Pack",color:STEP_LABELS[4].color})
+      h(NextBtn,{onClick:function(){saveProject();setStep(5);},label:"Save & Get Content Pack",color:STEP_LABELS[5].color})
     );
   };
 
-  // âââ STEP 4: CONTENT PACK ââââââââââââââââââââââââââââââ
+  // ─── STEP 5: CONTENT PACK ─────────────────────────────
 
-  var Step4 = function() {
+  var Step5 = function() {
     if(!aiResult) return h("div",null,"No content generated.");
-
     var script = aiResult.scripts && aiResult.scripts[pickedScript] ? aiResult.scripts[pickedScript].content : "";
     var hooks = aiResult.hooks || [];
     var captions = aiResult.captions || [];
     var adCopy = aiResult.adCopy || "";
     var shotList = aiResult.shotList || "";
+    var siteName = (WEBSITES.find(function(w){return w.id===website;})||{}).label||"";
 
     return h("div",{className:"fade-in"},
       h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f381} Your Content Pack"),
       h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "Everything's ready. Just copy and go!"),
 
-      // Summary card
       h(Card,{glow:"#22c55e"},
         h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
           h("div",null,
-            h("span",{style:{fontSize:15,fontWeight:700,color:"#86efac"}}, "â Ready to Go!"),
-            h("p",{style:{fontSize:12,color:"#64748b",margin:"4px 0 0"}}, brand + " â " + platform + " â " + format)
+            h("span",{style:{fontSize:15,fontWeight:700,color:"#86efac"}}, "✓ Ready to Go!"),
+            h("p",{style:{fontSize:12,color:"#64748b",margin:"4px 0 0"}}, siteName + " • " + platform + " • " + (mediaType==="picture"?"Picture":"Video"))
           ),
           h("span",{style:{fontSize:28}}, "\u{1f680}")
         )
       ),
 
-      // Script
       h(Card,{style:{marginTop:8}},
         h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
           h("span",{style:{fontSize:15,fontWeight:700,color:"#e2e8f0"}}, "\u{1f4c4} Your Script"),
@@ -704,7 +630,6 @@ function App() {
         h("pre",{style:{background:"#020617",padding:14,borderRadius:10,fontSize:13,color:"#94a3b8",overflow:"auto",maxHeight:200,margin:0,whiteSpace:"pre-wrap",lineHeight:1.5}}, script)
       ),
 
-      // Hooks
       h(Card,{style:{marginTop:8}},
         h("span",{style:{fontSize:15,fontWeight:700,color:"#e2e8f0",display:"block",marginBottom:10}}, "\u{1f3a3} Hook Variations"),
         hooks.map(function(hk,i){
@@ -715,7 +640,6 @@ function App() {
         })
       ),
 
-      // Captions
       h(Card,{style:{marginTop:8}},
         h("span",{style:{fontSize:15,fontWeight:700,color:"#e2e8f0",display:"block",marginBottom:10}}, "\u{1f4ac} Captions"),
         captions.map(function(c,i){
@@ -726,7 +650,6 @@ function App() {
         })
       ),
 
-      // Ad Copy (if paid platform)
       adCopy && h(Card,{style:{marginTop:8},glow:"#f59e0b"},
         h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
           h("span",{style:{fontSize:15,fontWeight:700,color:"#fbbf24"}}, "\u{1f4b0} Ad Copy"),
@@ -735,20 +658,18 @@ function App() {
         h("pre",{style:{background:"#020617",padding:14,borderRadius:10,fontSize:13,color:"#94a3b8",overflow:"auto",maxHeight:160,margin:0,whiteSpace:"pre-wrap",lineHeight:1.5}}, adCopy)
       ),
 
-      // Shot List
       shotList && h(Card,{style:{marginTop:8}},
         h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
-          h("span",{style:{fontSize:15,fontWeight:700,color:"#e2e8f0"}}, "\u{1f3ac} Shot List"),
+          h("span",{style:{fontSize:15,fontWeight:700,color:"#e2e8f0"}}, mediaType==="picture"?"\u{1f5bc}️ Image Guide":"\u{1f3ac} Shot List"),
           h(CopyBtn,{text:shotList})
         ),
         h("pre",{style:{background:"#020617",padding:14,borderRadius:10,fontSize:13,color:"#94a3b8",overflow:"auto",maxHeight:160,margin:0,whiteSpace:"pre-wrap",lineHeight:1.5}}, shotList)
       ),
 
-      // Action buttons
       h("div",{style:{display:"flex",gap:10,marginTop:32}},
         h("button",{onClick:function(){setView("home");setTab("create");},
           style:{flex:1,padding:"16px",borderRadius:14,border:"2px solid #334155",background:"transparent",color:"#94a3b8",fontSize:15,fontWeight:700,cursor:"pointer"}
-        }, "â Home"),
+        }, "← Home"),
         h("button",{onClick:resetWizard,
           style:{flex:2,padding:"16px",borderRadius:14,border:"none",fontSize:15,fontWeight:700,cursor:"pointer",background:"linear-gradient(135deg,#8b5cf6,#6366f1)",color:"#fff",boxShadow:"0 4px 20px #8b5cf640"}
         }, "+ Make Another")
@@ -756,27 +677,27 @@ function App() {
     );
   };
 
-  // âââ WIZARD WRAPPER âââââââââââââââââââââââââââââââââââââ
+  // ─── WIZARD WRAPPER ───────────────────────────────────
 
   var WizardScreen = function() {
-    var screens = [Step0, Step1, Step2, Step3, Step4];
+    var screens = [Step0, Step1, Step2, Step3, Step4, Step5];
     return h("div",{style:{maxWidth:540,margin:"0 auto",padding:"16px 20px 100px"}},
       h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}},
         h("button",{onClick:function(){if(step===0)setView("home");else setStep(step-1);},
           style:{background:"none",border:"none",color:"#94a3b8",fontSize:15,cursor:"pointer",padding:"6px 0",fontWeight:600}
-        }, "â " + (step===0?"Home":"Back"))
+        }, "← " + (step===0?"Home":"Back"))
       ),
       h(ProgressBar,{step:step}),
       screens[step]()
     );
   };
 
-  // âââ HOME SCREEN ââââââââââââââââââââââââââââââââââââââââ
+  // ─── HOME SCREEN ──────────────────────────────────────
 
   var HomeScreen = function() {
     return h("div",{style:{padding:24,maxWidth:480,margin:"0 auto"}},
       h("div",{style:{textAlign:"center",padding:"48px 0 36px"}},
-        h("div",{style:{fontSize:52,marginBottom:16}}, "â¡"),
+        h("div",{style:{fontSize:52,marginBottom:16}}, "⚡"),
         h("h1",{style:{fontSize:28,fontWeight:900,color:"#e2e8f0",margin:0,lineHeight:1.2}},
           "Viral Content", h("br"), "Operating System"
         ),
@@ -790,7 +711,9 @@ function App() {
       h("div",{style:{marginTop:32,display:"flex",flexDirection:"column",gap:10}},
         [
           {icon:"\u{1f4c1}",label:"Saved Projects",count:projects.length,action:function(){setTab("projects");setView("projects");}},
-          {icon:"\u{2699}ï¸",label:"Settings",count:"",action:function(){setTab("settings");setView("settings");}},
+          {icon:"\u{1f4dd}",label:"Info Bank",count:"",action:function(){setTab("infobank");setView("infobank");}},
+          {icon:"\u{1f4ca}",label:"IG Analytics",count:"Soon",action:function(){setTab("analytics");setView("analytics");}},
+          {icon:"\u{2699}️",label:"Settings",count:"",action:function(){setTab("settings");setView("settings");}},
         ].map(function(item,i){
           return h("button",{key:i,onClick:item.action,
             style:{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",padding:"16px 18px",background:"#0f172a",border:"1.5px solid #1e293b",borderRadius:14,color:"#e2e8f0",fontSize:15,cursor:"pointer",textAlign:"left",fontWeight:500}
@@ -801,30 +724,70 @@ function App() {
             item.count !== "" && h("span",{style:{background:"#1e293b",padding:"4px 12px",borderRadius:99,fontSize:13,color:"#94a3b8",fontWeight:600}},item.count)
           );
         })
-      ),
+      )
+    );
+  };
 
-      // Quick stats
-      savedBrands.length > 0 && h("div",{style:{marginTop:32}},
-        h(Section,{icon:"\u{2b50}",title:"Your Brands"}),
-        h("div",{style:{display:"flex",flexWrap:"wrap",gap:8,marginTop:8}},
-          savedBrands.map(function(b){
-            return h("span",{key:b,style:{padding:"8px 16px",borderRadius:99,background:"#1e293b",color:"#94a3b8",fontSize:13,fontWeight:500}}, b);
+  // ─── INFO BANK ────────────────────────────────────────
+
+  var InfoBankScreen = function() {
+    return h("div",{style:{maxWidth:540,margin:"0 auto",padding:"16px 20px 100px"}},
+      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f4dd} Info Bank"),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 24px"}}, "Add notes, competitor examples, brand guidelines, or anything that helps generate better content. This info gets fed to the AI when you create content for that website."),
+
+      WEBSITES.map(function(w){
+        var isEditing = editingInfo === w.id;
+        var currentInfo = infoBank[w.id] || "";
+        return h(Card,{key:w.id,glow:isEditing?w.color:undefined,style:{marginBottom:12}},
+          h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:isEditing?12:0}},
+            h("div",{style:{display:"flex",alignItems:"center",gap:10}},
+              h("span",{style:{fontSize:24}},w.icon),
+              h("div",null,
+                h("div",{style:{fontSize:15,fontWeight:700,color:"#e2e8f0"}},w.label),
+                h("div",{style:{fontSize:12,color:"#64748b"}},w.url)
+              )
+            ),
+            h("button",{onClick:function(){setEditingInfo(isEditing?"":w.id);},
+              style:{background:isEditing?"#14532d":"#1e293b",border:"none",borderRadius:10,padding:"6px 14px",color:isEditing?"#86efac":"#94a3b8",fontSize:13,cursor:"pointer",fontWeight:600}
+            }, isEditing?"Done":currentInfo?"\u{270f}️ Edit":"\u{2795} Add Info")
+          ),
+          !isEditing && currentInfo && h("p",{style:{fontSize:13,color:"#94a3b8",marginTop:10,lineHeight:1.5,whiteSpace:"pre-wrap"}}, currentInfo.length > 150 ? currentInfo.substring(0,150)+"..." : currentInfo),
+          isEditing && h("textarea",{
+            value:currentInfo,
+            onChange:function(e){var newBank=Object.assign({},infoBank);newBank[w.id]=e.target.value;setInfoBank(newBank);},
+            placeholder:"Paste competitor examples, brand guidelines, audience insights, unique selling points, past winning content ideas...",
+            style:{width:"100%",minHeight:120,padding:"14px 16px",background:"#020617",border:"2px solid "+w.color,borderRadius:14,color:"#e2e8f0",fontSize:14,outline:"none",fontFamily:"inherit",boxSizing:"border-box",resize:"vertical",lineHeight:1.5}
           })
+        );
+      })
+    );
+  };
+
+  // ─── IG ANALYTICS (PLACEHOLDER) ───────────────────────
+
+  var AnalyticsScreen = function() {
+    return h("div",{style:{maxWidth:540,margin:"0 auto",padding:"16px 20px 100px",textAlign:"center"}},
+      h("div",{style:{padding:"60px 0"}},
+        h("div",{style:{fontSize:64,marginBottom:16}},"\u{1f4ca}"),
+        h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 12px"}}, "Instagram Analytics"),
+        h("p",{style:{color:"#64748b",fontSize:15,maxWidth:320,margin:"0 auto",lineHeight:1.6}}, "Coming soon. This will connect to your Instagram to analyze what's working, track engagement, and give you data-driven content suggestions."),
+        h("div",{style:{marginTop:32,padding:"16px 24px",background:"#0f172a",border:"2px solid #1e293b",borderRadius:16,display:"inline-block"}},
+          h("span",{style:{color:"#94a3b8",fontSize:14,fontWeight:600}}, "\u{1f6a7} Under Development")
         )
       )
     );
   };
 
-  // âââ SETTINGS âââââââââââââââââââââââââââââââââââââââââââ
+  // ─── SETTINGS ─────────────────────────────────────────
 
   var SettingsScreen = function() {
     return h("div",{style:{maxWidth:540,margin:"0 auto",padding:"16px 20px 100px"}},
-      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 24px"}}, "\u{2699}ï¸ Settings"),
+      h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 24px"}}, "\u{2699}️ Settings"),
 
       h(Card,null,
         h("div",{style:{marginBottom:16}},
           h("label",{style:{display:"block",fontSize:14,color:"#e2e8f0",marginBottom:6,fontWeight:600}}, "\u{1f511} OpenAI API Key"),
-          h("p",{style:{fontSize:12,color:"#64748b",margin:"0 0 8px"}}, "Add this to unlock AI-powered content generation. Get one at platform.openai.com"),
+          h("p",{style:{fontSize:12,color:"#64748b",margin:"0 0 8px"}}, "Add this to unlock AI-powered content. Get one at platform.openai.com"),
           h("input",{
             value:apiKey,
             onChange:function(e){setApiKey(e.target.value);},
@@ -833,34 +796,32 @@ function App() {
             style:{width:"100%",padding:"14px 16px",background:"#020617",border:"2px solid #1e293b",borderRadius:14,color:"#e2e8f0",fontSize:15,outline:"none",fontFamily:"monospace",boxSizing:"border-box"}
           })
         ),
-        apiKey ? h("div",{style:{padding:"8px 12px",background:"#14532d",borderRadius:10,color:"#86efac",fontSize:13,fontWeight:500}}, "â API key saved â AI generation is ON")
-               : h("div",{style:{padding:"8px 12px",background:"#1e293b",borderRadius:10,color:"#94a3b8",fontSize:13}}, "No key â using template generation (still works, just less creative)")
+        apiKey ? h("div",{style:{padding:"8px 12px",background:"#14532d",borderRadius:10,color:"#86efac",fontSize:13,fontWeight:500}}, "✓ API key saved — AI generation is ON")
+               : h("div",{style:{padding:"8px 12px",background:"#1e293b",borderRadius:10,color:"#94a3b8",fontSize:13}}, "No key — using template generation (still works, just less creative)")
       ),
 
       h(Card,{style:{marginTop:12}},
-        h("div",{style:{fontSize:14,color:"#e2e8f0",fontWeight:600,marginBottom:12}}, "\u{2b50} Saved Brands"),
-        savedBrands.length === 0 ? h("p",{style:{color:"#64748b",fontSize:13}}, "No brands saved yet. They'll appear here after you create content.")
-        : h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-          savedBrands.map(function(b,i){
-            return h("div",{key:i,style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 12px",background:"#020617",borderRadius:10}},
-              h("span",{style:{color:"#e2e8f0",fontSize:14}}, b),
-              h("button",{onClick:function(){setSavedBrands(savedBrands.filter(function(x){return x!==b;}));},
-                style:{background:"#7f1d1d",border:"none",borderRadius:8,padding:"4px 12px",color:"#fca5a5",fontSize:12,cursor:"pointer",fontWeight:600}
-              }, "Remove")
-            );
-          })
-        )
+        h("div",{style:{fontSize:14,color:"#e2e8f0",fontWeight:600,marginBottom:12}}, "\u{1f310} Your Websites"),
+        WEBSITES.map(function(w,i){
+          return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:i<WEBSITES.length-1?"1px solid #1e293b":"none"}},
+            h("span",{style:{fontSize:20}},w.icon),
+            h("div",{style:{flex:1}},
+              h("div",{style:{color:"#e2e8f0",fontSize:14,fontWeight:600}},w.label),
+              h("div",{style:{color:"#64748b",fontSize:12}},w.url)
+            )
+          );
+        })
       ),
 
       h(Card,{style:{marginTop:12}},
         h("button",{onClick:function(){if(confirm("Delete all saved projects?")){setProjects([]);}},
           style:{width:"100%",padding:"12px",borderRadius:10,border:"1px solid #7f1d1d",background:"transparent",color:"#fca5a5",fontSize:14,cursor:"pointer",fontWeight:600}
-        }, "\u{1f5d1}ï¸ Clear All Projects")
+        }, "\u{1f5d1}️ Clear All Projects")
       )
     );
   };
 
-  // âââ PROJECTS âââââââââââââââââââââââââââââââââââââââââââ
+  // ─── PROJECTS ─────────────────────────────────────────
 
   var ProjectsScreen = function() {
     return h("div",{style:{maxWidth:540,margin:"0 auto",padding:"16px 20px 100px"}},
@@ -876,26 +837,28 @@ function App() {
           }, "+ Make Your First One")
         )
       : projects.map(function(p,i){
+          var site = WEBSITES.find(function(w){return w.id===p.website;});
           return h(Card,{key:i},
             h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
               h("div",null,
                 h("h3",{style:{margin:0,fontSize:16,fontWeight:700,color:"#e2e8f0"}}, p.name),
-                h("p",{style:{margin:"4px 0 0",fontSize:13,color:"#64748b"}}, p.platform + " Â· " + (p.niche||"") + " Â· " + p.date)
+                h("p",{style:{margin:"4px 0 0",fontSize:13,color:"#64748b"}}, p.platform + " · " + (p.mediaType==="picture"?"Picture":"Video") + " · " + p.date)
               ),
-              h("span",{style:{fontSize:22}}, "\u{1f4c4}")
+              h("span",{style:{fontSize:22}}, site?site.icon:"\u{1f4c4}")
             )
           );
         })
     );
   };
 
-  // âââ BOTTOM NAV âââââââââââââââââââââââââââââââââââââââââ
+  // ─── BOTTOM NAV ───────────────────────────────────────
 
   var BottomNav = function() {
     var items = [
-      {id:"create",icon:"â¡",label:"Create"},
+      {id:"create",icon:"⚡",label:"Create"},
+      {id:"infobank",icon:"\u{1f4dd}",label:"Info Bank"},
       {id:"projects",icon:"\u{1f4c1}",label:"Projects"},
-      {id:"settings",icon:"âï¸",label:"Settings"},
+      {id:"settings",icon:"\u{2699}️",label:"Settings"},
     ];
     return h("div",{
       style:{position:"fixed",bottom:0,left:0,right:0,background:"#0f172aee",borderTop:"1px solid #1e293b",display:"flex",justifyContent:"space-around",padding:"10px 0 14px",zIndex:100,backdropFilter:"blur(10px)"}
@@ -912,12 +875,14 @@ function App() {
     );
   };
 
-  // âââ RENDER âââââââââââââââââââââââââââââââââââââââââââââ
+  // ─── RENDER ───────────────────────────────────────────
 
   var renderView = function() {
     if(view === "wizard") return WizardScreen();
     if(view === "settings") return SettingsScreen();
     if(view === "projects") return ProjectsScreen();
+    if(view === "infobank") return InfoBankScreen();
+    if(view === "analytics") return AnalyticsScreen();
     return HomeScreen();
   };
 

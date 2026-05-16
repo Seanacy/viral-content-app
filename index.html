@@ -50,6 +50,27 @@ var MODELBID_FEATURES = [
   {id:"circle-crew",label:"Circle Crew",icon:"\u{1f465}",color:"#3b82f6",desc:"Manage your exclusive subscriber community"},
 ];
 
+var PRODUCT_CONTEXT = {
+  "modelbid": {
+    "inner-circle": {
+      tagline: "2–4 models. One exclusive feed. Split the work, share the audience, grow faster together.",
+      benefits: [
+        "All creators in an Inner Circle get exposed to each other's audience (3x reach)",
+        "Earn more money by splitting the workload while sharing subscribers",
+        "Grow your name and brand faster through cross-promotion",
+        "You can be part of multiple Inner Circles at the same time"
+      ],
+      howItWorks: "2–4 models team up to create one exclusive subscription feed. Fans subscribe once and get content from all creators in the circle. Each creator brings their own audience, so everyone gets exposed to new fans they wouldn't have reached alone.",
+      sellingPoints: [
+        "Less work per creator (split content duties)",
+        "More subscribers (combined audiences)",
+        "Faster growth (built-in cross-promotion)",
+        "Multiple income streams (join several circles)"
+      ]
+    }
+  }
+};
+
 var CONTENT_TYPES = [
   {id:"organic",label:"Organic Content",icon:"\u{1f4f1}",color:"#22c55e",desc:"Free posts — TikTok, Reels, Stories, feed"},
   {id:"paid",label:"Paid Ad",icon:"\u{1f4b0}",color:"#f59e0b",desc:"Paid advertising — FB Ads, TikTok Ads, Google Ads"},
@@ -265,10 +286,28 @@ function generateWithAI(sel, apiKey, onResult, onError) {
   var featureStr = featureObj ? featureObj.label : "";
   var offerName = featureStr ? featureStr + " on " + siteName : siteName;
 
+  // Pull product context if available
+  var prodCtx = null;
+  if (site && sel.feature && PRODUCT_CONTEXT[site.id] && PRODUCT_CONTEXT[site.id][sel.feature]) {
+    prodCtx = PRODUCT_CONTEXT[site.id][sel.feature];
+  }
+
   var sysPrompt = "You are a world-class viral content strategist. Generate content promoting " + offerName + " (" + siteUrl + "). IMPORTANT: The creator's goal is to '" + sel.goal + "' — this means the CONTENT should be designed so that VIEWERS take that action (e.g. if goal is 'Get DMs', make content that entices viewers to DM the creator about the offer — do NOT create content about teaching viewers how to get DMs). The content sells/promotes the creator's offer, and the goal describes what response the creator wants from viewers. Return ONLY valid JSON: {\"scripts\":[{\"title\":\"...\",\"content\":\"...\"},...],\"hooks\":[\"...\"],\"captions\":[\"...\"],\"adCopy\":\"...\",\"shotList\":\"...\"}. Generate 3 " + (isImage ? "image ad concepts (each with HEADLINE, BODY TEXT, CTA, VISUAL DESCRIPTION)" : "scripts with timing and stage directions") + ", 5 hooks, 3 captions." + (isPaid ? " Include compelling ad copy with headline, primary text, CTA." : " Set adCopy to empty string.") + (isImage ? " For shotList provide image composition guidance." : " For shotList provide shot-by-shot filming guide.") + " Match the tone: " + sel.tone + "." + (featureStr ? " Focus specifically on the " + featureStr + " feature — make the content about what makes " + featureStr + " valuable to the viewer." : "");
+
+  var productContextStr = "";
+  if (prodCtx) {
+    productContextStr = "\n\n--- PRODUCT DETAILS ---" +
+      "\nTagline: " + prodCtx.tagline +
+      "\nHow It Works: " + prodCtx.howItWorks +
+      "\nKey Benefits: " + prodCtx.benefits.join("; ") +
+      "\nSelling Points: " + prodCtx.sellingPoints.join("; ") +
+      "\n--- END PRODUCT DETAILS ---" +
+      "\nUse the above product details to create content that accurately represents what " + featureStr + " actually is and why viewers should care.";
+  }
 
   var userPrompt = "Website: " + siteName + " (" + siteUrl + ")" +
     (featureStr ? "\nFeature to Promote: " + featureStr + " — " + featureObj.desc : "") +
+    productContextStr +
     "\nContent Type: " + (isPaid ? "Paid Ad" : "Organic Content") +
     "\nMedia: " + (isImage ? "Static Image" : "Video") +
     "\nPlatform: " + sel.platform +

@@ -43,6 +43,13 @@ var WEBSITES = [
   {id:"stagepass",label:"StagePass",url:"stagepass.tech",icon:"\u{1f3a4}",color:"#a855f7",desc:"Event & performance platform"},
 ];
 
+var MODELBID_FEATURES = [
+  {id:"inner-circle",label:"Inner Circle",icon:"\u{1f451}",color:"#ec4899",desc:"Exclusive subscription tier — fans pay monthly for premium access to their favorite model"},
+  {id:"store",label:"Store / Products",icon:"\u{1f6cd}️",color:"#f59e0b",desc:"Sell digital products like ebooks, presets, courses"},
+  {id:"profile",label:"Model Profile",icon:"\u{1f4f8}",color:"#8b5cf6",desc:"Showcase and grow your personal brand page"},
+  {id:"circle-crew",label:"Circle Crew",icon:"\u{1f465}",color:"#3b82f6",desc:"Manage your exclusive subscriber community"},
+];
+
 var CONTENT_TYPES = [
   {id:"organic",label:"Organic Content",icon:"\u{1f4f1}",color:"#22c55e",desc:"Free posts — TikTok, Reels, Stories, feed"},
   {id:"paid",label:"Paid Ad",icon:"\u{1f4b0}",color:"#f59e0b",desc:"Paid advertising — FB Ads, TikTok Ads, Google Ads"},
@@ -54,14 +61,14 @@ var MEDIA_TYPES = [
 ];
 
 var GOALS = [
-  {label:"Drive Sales",icon:"\u{1f4b0}",desc:"Get people to buy"},
-  {label:"Get DMs",icon:"\u{1f4e9}",desc:"Drive people to message you"},
-  {label:"Get Follows",icon:"\u{2795}",desc:"Grow your audience"},
-  {label:"Get Clicks",icon:"\u{1f446}",desc:"Send people to your link"},
-  {label:"Get Shares",icon:"\u{1f504}",desc:"People send it to friends"},
-  {label:"Build Trust",icon:"\u{1f91d}",desc:"Position as authority"},
-  {label:"Get Signups",icon:"\u{1f4cb}",desc:"Email list, waitlist, app downloads"},
-  {label:"Stop the Scroll",icon:"\u{1f6d1}",desc:"Make people pause and watch"},
+  {label:"Drive Sales",icon:"\u{1f4b0}",desc:"Viewers buy your offer"},
+  {label:"Get DMs",icon:"\u{1f4e9}",desc:"Viewers message YOU about your offer"},
+  {label:"Get Follows",icon:"\u{2795}",desc:"Viewers follow YOUR page"},
+  {label:"Get Clicks",icon:"\u{1f446}",desc:"Viewers tap YOUR link"},
+  {label:"Get Shares",icon:"\u{1f504}",desc:"Viewers share your content with friends"},
+  {label:"Build Trust",icon:"\u{1f91d}",desc:"Viewers see YOU as the authority"},
+  {label:"Get Signups",icon:"\u{1f4cb}",desc:"Viewers sign up for YOUR list or app"},
+  {label:"Stop the Scroll",icon:"\u{1f6d1}",desc:"Viewers stop and pay attention"},
 ];
 
 var PLATFORMS_ORGANIC = [
@@ -254,18 +261,23 @@ function generateWithAI(sel, apiKey, onResult, onError) {
   var siteName = site ? site.label : "Brand";
   var siteUrl = site ? site.url : "";
 
-  var sysPrompt = "You are a world-class viral content strategist. Generate content for " + siteName + " (" + siteUrl + "). Return ONLY valid JSON: {\"scripts\":[{\"title\":\"...\",\"content\":\"...\"},...],\"hooks\":[\"...\"],\"captions\":[\"...\"],\"adCopy\":\"...\",\"shotList\":\"...\"}. Generate 3 " + (isImage ? "image ad concepts (each with HEADLINE, BODY TEXT, CTA, VISUAL DESCRIPTION)" : "scripts with timing and stage directions") + ", 5 hooks, 3 captions." + (isPaid ? " Include compelling ad copy with headline, primary text, CTA." : " Set adCopy to empty string.") + (isImage ? " For shotList provide image composition guidance." : " For shotList provide shot-by-shot filming guide.") + " Match the tone: " + sel.tone + ". Goal: " + sel.goal + ".";
+  var featureObj = sel.feature ? MODELBID_FEATURES.find(function(f){return f.id===sel.feature;}) : null;
+  var featureStr = featureObj ? featureObj.label : "";
+  var offerName = featureStr ? featureStr + " on " + siteName : siteName;
+
+  var sysPrompt = "You are a world-class viral content strategist. Generate content promoting " + offerName + " (" + siteUrl + "). IMPORTANT: The creator's goal is to '" + sel.goal + "' — this means the CONTENT should be designed so that VIEWERS take that action (e.g. if goal is 'Get DMs', make content that entices viewers to DM the creator about the offer — do NOT create content about teaching viewers how to get DMs). The content sells/promotes the creator's offer, and the goal describes what response the creator wants from viewers. Return ONLY valid JSON: {\"scripts\":[{\"title\":\"...\",\"content\":\"...\"},...],\"hooks\":[\"...\"],\"captions\":[\"...\"],\"adCopy\":\"...\",\"shotList\":\"...\"}. Generate 3 " + (isImage ? "image ad concepts (each with HEADLINE, BODY TEXT, CTA, VISUAL DESCRIPTION)" : "scripts with timing and stage directions") + ", 5 hooks, 3 captions." + (isPaid ? " Include compelling ad copy with headline, primary text, CTA." : " Set adCopy to empty string.") + (isImage ? " For shotList provide image composition guidance." : " For shotList provide shot-by-shot filming guide.") + " Match the tone: " + sel.tone + "." + (featureStr ? " Focus specifically on the " + featureStr + " feature — make the content about what makes " + featureStr + " valuable to the viewer." : "");
 
   var userPrompt = "Website: " + siteName + " (" + siteUrl + ")" +
+    (featureStr ? "\nFeature to Promote: " + featureStr + " — " + featureObj.desc : "") +
     "\nContent Type: " + (isPaid ? "Paid Ad" : "Organic Content") +
     "\nMedia: " + (isImage ? "Static Image" : "Video") +
     "\nPlatform: " + sel.platform +
-    "\nGoal: " + sel.goal +
+    "\nCreator's Goal: " + sel.goal + " (this is what the creator wants viewers to do — NOT what the content teaches)" +
     "\nFormat: " + sel.format +
     "\nHook Style: " + sel.hook +
     "\nTone: " + sel.tone +
     (sel.infoBank ? "\n\nAdditional Context:\n" + sel.infoBank : "") +
-    "\n\nGenerate viral content. Be specific to this brand and platform.";
+    "\n\nGenerate viral content that promotes " + offerName + " and drives viewers to " + sel.goal.toLowerCase() + ". Be specific to this brand and platform.";
 
   fetch("https://api.openai.com/v1/chat/completions", {
     method:"POST",
@@ -291,40 +303,45 @@ function generateWithAI(sel, apiKey, onResult, onError) {
 function generateFallback(sel) {
   var site = WEBSITES.find(function(w){return w.id===sel.website;});
   var brand = site ? site.label : "Your Brand";
+  var featureObj = sel.feature ? MODELBID_FEATURES.find(function(f){return f.id===sel.feature;}) : null;
+  var offer = featureObj ? featureObj.label + " on " + brand : brand;
   var isImage = sel.mediaType === "picture";
   var isPaid = sel.contentType === "paid";
   var goal = sel.goal || "engagement";
   var tone = sel.tone || "authentic";
   var format = sel.format || "content";
 
+  // Goal-driven CTAs — what the creator wants viewers to DO
+  var goalCTA = goal==="Get DMs" ? "DM me for details" : goal==="Drive Sales" ? "Tap the link to get started" : goal==="Get Follows" ? "Follow for more" : goal==="Get Clicks" ? "Link in bio" : goal==="Get Shares" ? "Tag someone who needs this" : goal==="Build Trust" ? "Follow for more real talk" : goal==="Get Signups" ? "Sign up — link in bio" : goal==="Stop the Scroll" ? "Save this for later" : "Check it out";
+
   var scripts = isImage ? [
-    {title:"Image Concept A", content:"HEADLINE: \"" + brand + " — built different.\"\n\nBODY: The " + goal.toLowerCase() + " solution you've been waiting for.\n\nCTA: \"Tap to learn more\" or \"DM us now\"\n\nVISUAL: Clean product/brand shot, bold headline overlay, " + tone.toLowerCase() + " color palette"},
-    {title:"Image Concept B", content:"HEADLINE: \"This changes everything.\"\n\nBODY: " + brand + " just made " + goal.toLowerCase() + " effortless.\n\nCTA: \"Link in bio\" or \"Send us a DM\"\n\nVISUAL: Lifestyle photo, minimal text, aspirational vibe"},
-    {title:"Image Concept C", content:"HEADLINE: \"Don't sleep on " + brand + ".\"\n\nBODY: Thousands already know. Now it's your turn.\n\nCTA: \"Tap now\" or \"DM for details\"\n\nVISUAL: Bold graphic with urgency element, eye-catching contrast"},
+    {title:"Image Concept A", content:"HEADLINE: \"" + offer + " — built different.\"\n\nBODY: The exclusive access you've been waiting for.\n\nCTA: \"" + goalCTA + "\"\n\nVISUAL: Clean product/brand shot, bold headline overlay, " + tone.toLowerCase() + " color palette"},
+    {title:"Image Concept B", content:"HEADLINE: \"This changes everything.\"\n\nBODY: " + offer + " is giving creators a whole new level.\n\nCTA: \"" + goalCTA + "\"\n\nVISUAL: Lifestyle photo, minimal text, aspirational vibe"},
+    {title:"Image Concept C", content:"HEADLINE: \"Don't sleep on " + offer + ".\"\n\nBODY: Thousands already joined. Now it's your turn.\n\nCTA: \"" + goalCTA + "\"\n\nVISUAL: Bold graphic with urgency element, eye-catching contrast"},
   ] : [
-    {title:format + " — Option A", content:"HOOK (0-2s): \"Nobody talks about this " + brand + " secret...\"\n\nBUILD (2-8s): Show the problem. Make it relatable. " + tone + " energy.\n\nPAYOFF (8-15s): Reveal " + brand + " as the answer.\n\nCTA: \"Follow for more\" or \"Link in bio\""},
-    {title:format + " — Option B", content:"HOOK (0-2s): \"POV: You finally found " + brand + "\"\n\nBUILD (2-8s): Start with frustration. Show failed attempts.\n\nPAYOFF (8-15s): The moment they discover " + brand + ". Genuine reaction.\n\nCTA: \"Save this for later\""},
-    {title:format + " — Option C", content:"HOOK (0-2s): \"3 things about " + brand + " that will blow your mind\"\n\nPOINT 1 (2-5s): The surprising fact\n\nPOINT 2 (5-8s): Why " + brand + " does it differently\n\nPOINT 3 (8-12s): The result that speaks for itself\n\nCTA: \"Which one surprised you?\""},
+    {title:format + " — Option A", content:"HOOK (0-2s): \"Nobody talks about " + offer + "...\"\n\nBUILD (2-8s): Show what makes " + offer + " different. " + tone + " energy.\n\nPAYOFF (8-15s): Reveal the value — why viewers need to check it out now.\n\nCTA: \"" + goalCTA + "\""},
+    {title:format + " — Option B", content:"HOOK (0-2s): \"POV: You just found out about " + offer + "\"\n\nBUILD (2-8s): Show the before — missing out. Build curiosity.\n\nPAYOFF (8-15s): The moment they see what " + offer + " offers. Genuine reaction.\n\nCTA: \"" + goalCTA + "\""},
+    {title:format + " — Option C", content:"HOOK (0-2s): \"3 things about " + offer + " that will blow your mind\"\n\nPOINT 1 (2-5s): What makes it unique\n\nPOINT 2 (5-8s): Why " + offer + " is different from everything else\n\nPOINT 3 (8-12s): The result that speaks for itself\n\nCTA: \"" + goalCTA + "\""},
   ];
 
   return {
     scripts: scripts,
     hooks: [
-      "Nobody's talking about " + brand + "...",
-      "POV: You just discovered " + brand,
-      "Stop scrolling if you need " + goal.toLowerCase(),
-      "I tried everything and " + brand + " actually works",
-      "This one's for everyone trying to " + goal.toLowerCase(),
+      "Nobody's talking about " + offer + "...",
+      "POV: You just discovered " + offer,
+      "Stop scrolling — you need to see " + offer,
+      "I wish I knew about " + offer + " sooner",
+      "This is why everyone's joining " + offer,
     ],
     captions: [
       "This changed everything \u{1f631} #" + brand.replace(/\s/g,"") + " #viral #fyp",
       "Save this for later \u{1f516} #" + brand.replace(/\s/g,"") + " #gamechanger",
-      "Tag someone who needs this \u{1f447} #" + brand.replace(/\s/g,"") + " #fyp",
+      "Tag someone who needs to see this \u{1f447} #" + brand.replace(/\s/g,"") + " #fyp",
     ],
-    adCopy: isPaid ? "HEADLINE: " + brand + " — Your " + goal + " Solution\n\nPRIMARY TEXT: Ready to " + goal.toLowerCase() + "? " + brand + " makes it simple.\n\n✓ Real results\n✓ Trusted platform\n✓ Join thousands\n\nCTA: Learn More" : "",
+    adCopy: isPaid ? "HEADLINE: " + offer + " — See What You're Missing\n\nPRIMARY TEXT: " + offer + " is giving people exclusive access like never before.\n\n\u{2713} Real results\n\u{2713} Trusted platform\n\u{2713} Join thousands\n\nCTA: " + goalCTA : "",
     shotList: isImage ?
-      "IMAGE COMPOSITION for " + brand + "\n\n\u{1f5bc}️ LAYOUT\nClean, eye-catching composition\nBold headline text at top or center\nBrand prominent but not cluttered\n\n\u{1f3a8} STYLE\n" + tone + " vibe\nHigh contrast for scroll-stopping impact\n\n\u{1f4dd} TEXT\nKeep to 5-8 words max on image\nCTA button directing to action\n\n\u{1f4f0} SPECS\n1080x1080 for feed\n1080x1920 for stories"
-      : "SHOT LIST for " + brand + "\n\n\u{1f3ac} SHOT 1 — HOOK (0-2s)\nGrab attention immediately\n\n\u{1f3ac} SHOT 2 — PROBLEM (2-5s)\nShow the pain point\n\n\u{1f3ac} SHOT 3 — REVEAL (5-10s)\nIntroduce " + brand + "\n\n\u{1f3ac} SHOT 4 — PAYOFF (10-15s)\nShow the result + CTA",
+      "IMAGE COMPOSITION for " + offer + "\n\n\u{1f5bc}️ LAYOUT\nClean, eye-catching composition\nBold headline text at top or center\nBrand prominent but not cluttered\n\n\u{1f3a8} STYLE\n" + tone + " vibe\nHigh contrast for scroll-stopping impact\n\n\u{1f4dd} TEXT\nKeep to 5-8 words max on image\nCTA directing viewer to " + goalCTA + "\n\n\u{1f4f0} SPECS\n1080x1080 for feed\n1080x1920 for stories"
+      : "SHOT LIST for " + offer + "\n\n\u{1f3ac} SHOT 1 — HOOK (0-2s)\nGrab attention immediately\n\n\u{1f3ac} SHOT 2 — BUILD (2-5s)\nShow what makes " + offer + " special\n\n\u{1f3ac} SHOT 3 — REVEAL (5-10s)\nShow the value viewers get\n\n\u{1f3ac} SHOT 4 — CTA (10-15s)\n" + goalCTA,
   };
 }
 
@@ -346,6 +363,7 @@ function App() {
   var _format = useState(""), format = _format[0], setFormat = _format[1];
   var _hookStyle = useState(""), hookStyle = _hookStyle[0], setHookStyle = _hookStyle[1];
   var _tone = useState(""), tone = _tone[0], setTone = _tone[1];
+  var _feature = useState(""), feature = _feature[0], setFeature = _feature[1];
 
   // AI
   var _aiResult = useState(null), aiResult = _aiResult[0], setAiResult = _aiResult[1];
@@ -366,13 +384,13 @@ function App() {
 
   var resetWizard = function() {
     setStep(0); setWebsite(""); setContentType(""); setMediaType(""); setPlatform("");
-    setGoal(""); setFormat(""); setHookStyle(""); setTone("");
+    setGoal(""); setFormat(""); setHookStyle(""); setTone(""); setFeature("");
     setAiResult(null); setAiError(""); setPickedScript(0); setView("wizard");
   };
 
   var doGenerate = function() {
     setLoading(true); setAiError(""); setAiResult(null);
-    var sel = {website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,hook:hookStyle,tone:tone,infoBank:infoBank[website]||""};
+    var sel = {website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,hook:hookStyle,tone:tone,feature:feature,infoBank:infoBank[website]||""};
     if(apiKey) {
       generateWithAI(sel, apiKey, function(result){setAiResult(result);setLoading(false);}, function(err){
         setAiResult(generateFallback(sel));setAiError("AI error: "+err+" — Showing templates instead.");setLoading(false);
@@ -384,7 +402,7 @@ function App() {
 
   var saveProject = function() {
     var site = WEBSITES.find(function(w){return w.id===website;});
-    var p = {id:Date.now(),name:site?site.label:"Untitled",website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,date:new Date().toLocaleDateString(),result:aiResult,pickedScript:pickedScript};
+    var p = {id:Date.now(),name:site?site.label:"Untitled",website:website,contentType:contentType,mediaType:mediaType,platform:platform,goal:goal,format:format,feature:feature,date:new Date().toLocaleDateString(),result:aiResult,pickedScript:pickedScript};
     setProjects(function(prev){return [p].concat(prev);});
   };
 
@@ -397,7 +415,7 @@ function App() {
 
       h("div",{style:{display:"flex",flexDirection:"column",gap:10}},
         WEBSITES.map(function(w){
-          return h("button",{key:w.id,onClick:function(){setWebsite(w.id);},
+          return h("button",{key:w.id,onClick:function(){setWebsite(w.id);if(w.id!=="modelbid"){setFeature("");}},
             style:{
               display:"flex",alignItems:"center",gap:14,width:"100%",padding:"18px 20px",
               background:website===w.id?w.color+"15":"#0f172a",
@@ -416,7 +434,16 @@ function App() {
         })
       ),
 
-      h(NextBtn,{onClick:function(){setStep(1);},label:"Next: Content Type",disabled:!website,color:STEP_LABELS[1].color})
+      website==="modelbid" && h("div",{style:{marginTop:24}},
+        h(Section,{icon:"\u{1f451}",title:"Which ModelBid feature?",sub:"Pick the feature you want to promote in this content."}),
+        h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+          MODELBID_FEATURES.map(function(f){
+            return h(TapCard,{key:f.id,label:f.label,desc:f.desc,icon:f.icon,color:f.color,active:feature===f.id,onClick:function(){setFeature(f.id);}});
+          })
+        )
+      ),
+
+      h(NextBtn,{onClick:function(){setStep(1);},label:"Next: Content Type",disabled:!website||(website==="modelbid"&&!feature),color:STEP_LABELS[1].color})
     );
   };
 
@@ -476,7 +503,7 @@ function App() {
       h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f3af} Goal & Platform"),
       h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 28px"}}, "What's the point of this content and where does it go?"),
 
-      h(Section,{icon:"\u{1f3af}",title:"What's the goal?",sub:"What should this content do?"}),
+      h(Section,{icon:"\u{1f3af}",title:"What's YOUR goal?",sub:"What do you want viewers to do after seeing your content?"}),
       h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
         GOALS.map(function(g){
           return h("button",{key:g.label,onClick:function(){setGoal(g.label);},
@@ -566,9 +593,11 @@ function App() {
     }
 
     var siteName = (WEBSITES.find(function(w){return w.id===website;})||{}).label||"";
+    var featureName = feature ? (MODELBID_FEATURES.find(function(f){return f.id===feature;})||{}).label||"" : "";
+    var displayName = featureName ? featureName + " on " + siteName : siteName;
     return h("div",{className:"fade-in"},
       h("h2",{style:{fontSize:24,fontWeight:800,color:"#e2e8f0",margin:"0 0 6px"}}, "\u{1f916} Your Content"),
-      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 8px"}}, siteName + " • " + (contentType==="paid"?"Paid Ad":"Organic") + " • " + (mediaType==="picture"?"Picture":"Video")),
+      h("p",{style:{color:"#64748b",fontSize:14,margin:"0 0 8px"}}, displayName + " • " + (contentType==="paid"?"Paid Ad":"Organic") + " • " + (mediaType==="picture"?"Picture":"Video")),
 
       aiError && h(Card,{glow:"#f59e0b",style:{marginBottom:16}},
         h("p",{style:{color:"#fbbf24",fontSize:13,margin:0}}, "⚠️ " + aiError)
